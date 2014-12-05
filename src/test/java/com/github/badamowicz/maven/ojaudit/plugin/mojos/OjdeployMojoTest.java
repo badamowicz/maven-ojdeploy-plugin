@@ -33,7 +33,10 @@ import static org.testng.Assert.assertSame;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -72,6 +75,9 @@ public class OjdeployMojoTest {
     private static final Boolean           BUILD_FILE_SCHEMA = Boolean.FALSE;
 
     private OjdeployMojo                   mojo              = null;
+    private OjdeployMojo                   messyMojo1        = null;
+    private OjdeployMojo                   messyMojo2        = null;
+    private OjdeployMojo                   messyMojo3        = null;
 
     @BeforeClass
     public void beforeClass() {
@@ -94,6 +100,39 @@ public class OjdeployMojoTest {
         mojo.setBuildFileSchema(BUILD_FILE_SCHEMA);
         mojo.setUpdateWebxmlEJBRefs(UPDATE_WEB_XML);
         mojo.setWorkspaceFile(WORKSPACE_FILE);
+
+        prepareMessyMojos();
+    }
+
+    /**
+     * Provide some Mojos which are configured with mutual exclusive arguments.
+     */
+    private void prepareMessyMojos() {
+
+        messyMojo1 = new OjdeployMojo();
+        messyMojo2 = new OjdeployMojo();
+        messyMojo3 = new OjdeployMojo();
+
+        messyMojo1.setBuildFileSchema(BUILD_FILE_SCHEMA);
+        messyMojo1.setBuildFile(BUILD_FILE);
+
+        messyMojo2.setBuildFileSchema(BUILD_FILE_SCHEMA);
+        messyMojo2.setProfile(PROFILE_FILE);
+
+        messyMojo3.setBuildFile(BUILD_FILE);
+        messyMojo3.setProfile(PROFILE_FILE);
+    }
+
+    @DataProvider(name = "MessyMojoProvider")
+    public Object[][] provideMessyMojos() {
+
+        return new Object[][] { { messyMojo1, null }, { messyMojo2, null }, { messyMojo3, null } };
+    }
+
+    @Test(expectedExceptions = MojoExecutionException.class, dataProvider = "MessyMojoProvider")
+    public void checkMutualExclusives(OjdeployMojo mojo, Object notUsed) throws MojoExecutionException, MojoFailureException {
+
+        mojo.execute();
     }
 
     @Test

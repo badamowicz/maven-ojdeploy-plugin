@@ -175,8 +175,21 @@ public class OjdeployMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        // check mutual exclusive parameters
+        checkMutualExclusives();
 
+    }
+
+    /**
+     * Check if mutual exclusive command are given at the same run.
+     * 
+     * @throws MojoExecutionException If more than one mutual exclusive command is given.
+     */
+    void checkMutualExclusives() throws MojoExecutionException {
+
+        if ((getBuildFileSchema() != null && getBuildFile() != null) || (getBuildFileSchema() != null && getProfile() != null)
+                || (getBuildFile() != null && getProfile() != null))
+            throw new MojoExecutionException(
+                    "Mutual exclusive arguments given! Only one of 'buildFile', 'profile' or 'buildFileSchema' must be given!");
     }
 
     public void setJdevBinPath(File jdevBinPath) {
