@@ -50,6 +50,14 @@ import org.apache.maven.plugin.MojoFailureException;
 public class OjdeployMojo extends AbstractMojo {
 
     /**
+     * If set to true, only the ojdeploy-command that would have been executed will be issued. Beware that this parameter will
+     * <b>not</b> be handed over to the ojdeploy command!
+     * 
+     * @parameter property="dryRun" default-value="false"
+     */
+    private Boolean      dryRun              = null;
+
+    /**
      * The path pointing to the directory containing the ojdeploy binary. Example:
      * <i>/opt/Oracle/Middleware/jdeveloper/jdev/bin</i>. If not given, it is assumed ojdeploy is available inside the system's
      * path variable.
@@ -277,89 +285,99 @@ public class OjdeployMojo extends AbstractMojo {
         this.timeout = timeout;
     }
 
-    File getJdevBinPath() {
+    public File getJdevBinPath() {
 
         return jdevBinPath;
     }
 
-    File getWorkspaceFile() {
+    public File getWorkspaceFile() {
 
         return workspaceFile;
     }
 
-    File getBuildFile() {
+    public File getBuildFile() {
 
         return buildFile;
     }
 
-    File getOutputFile() {
+    public File getOutputFile() {
 
         return outputFile;
     }
 
-    File getProfile() {
+    public File getProfile() {
 
         return profile;
     }
 
-    String getProject() {
+    public String getProject() {
 
         return project;
     }
 
-    Boolean getBuildFileSchema() {
+    public Boolean getBuildFileSchema() {
 
         return buildFileSchema;
     }
 
-    File getBaseDir() {
+    public File getBaseDir() {
 
         return baseDir;
     }
 
-    Boolean getNocompile() {
+    public Boolean getNocompile() {
 
         return nocompile;
     }
 
-    Boolean getNodependents() {
+    public Boolean getNodependents() {
 
         return nodependents;
     }
 
-    Boolean getClean() {
+    public Boolean getClean() {
 
         return clean;
     }
 
-    Boolean getNodatasources() {
+    public Boolean getNodatasources() {
 
         return nodatasources;
     }
 
-    Boolean getForcerewrite() {
+    public Boolean getForcerewrite() {
 
         return forcerewrite;
     }
 
-    Boolean getUpdateWebxmlEJBRefs() {
+    public Boolean getUpdateWebxmlEJBRefs() {
 
         return updateWebxmlEJBRefs;
     }
 
-    List<String> getDefines() {
+    public List<String> getDefines() {
 
         return defines;
     }
 
-    File getStatusLogFile() {
+    public File getStatusLogFile() {
 
         return statusLogFile;
     }
 
-    Long getTimeout() {
+    public Long getTimeout() {
 
         return timeout;
+    }
+
+    public Boolean getDryRun() {
+
+        return dryRun;
+    }
+
+    public void setDryRun(Boolean dryRun) {
+
+        this.dryRun = dryRun;
     }
 
 }

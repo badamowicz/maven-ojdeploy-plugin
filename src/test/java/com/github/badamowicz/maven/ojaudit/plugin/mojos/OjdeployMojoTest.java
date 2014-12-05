@@ -73,6 +73,7 @@ public class OjdeployMojoTest {
     private static final File              STATUS_LOG_FILE   = new File("/some/path/status.log");
     private static final Long              TIMEOUT           = 300l;
     private static final Boolean           BUILD_FILE_SCHEMA = Boolean.FALSE;
+    private static final Boolean           DRY_RUN           = Boolean.TRUE;
 
     private OjdeployMojo                   mojo              = null;
     private OjdeployMojo                   messyMojo1        = null;
@@ -100,6 +101,7 @@ public class OjdeployMojoTest {
         mojo.setBuildFileSchema(BUILD_FILE_SCHEMA);
         mojo.setUpdateWebxmlEJBRefs(UPDATE_WEB_XML);
         mojo.setWorkspaceFile(WORKSPACE_FILE);
+        mojo.setDryRun(DRY_RUN);
 
         prepareMessyMojos();
     }
@@ -133,6 +135,12 @@ public class OjdeployMojoTest {
     public void checkMutualExclusives(OjdeployMojo mojo, Object notUsed) throws MojoExecutionException, MojoFailureException {
 
         mojo.execute();
+    }
+
+    @Test
+    private void getDryRun() {
+
+        assertEquals(mojo.getDryRun(), DRY_RUN, "Dry run not set as expected!");
     }
 
     @Test
