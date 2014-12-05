@@ -88,7 +88,7 @@ public class OjdeployMojoTest {
         mojo.setBuildFile(BUILD_FILE);
         mojo.setClean(CLEAN);
         mojo.setDefines(DEFINES);
-        mojo.setForcerewrite(FORCEWRITE);
+        mojo.setForceRewrite(FORCEWRITE);
         mojo.setJdevBinPath(JDEV_BIN_PATH);
         mojo.setNocompile(NOCOMPILE);
         mojo.setNodatasources(NODATASOURCES);
@@ -177,7 +177,7 @@ public class OjdeployMojoTest {
     @Test
     public void getForcerewrite() {
 
-        assertEquals(mojo.getForcerewrite(), FORCEWRITE, "Force write not set as expected!");
+        assertEquals(mojo.getForceRewrite(), FORCEWRITE, "Force write not set as expected!");
     }
 
     @Test
