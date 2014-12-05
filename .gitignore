@@ -1,7 +1,6 @@
 *.class
 test-output
 target
-*log*
 
 # Eclipse stuff
 .classpath
