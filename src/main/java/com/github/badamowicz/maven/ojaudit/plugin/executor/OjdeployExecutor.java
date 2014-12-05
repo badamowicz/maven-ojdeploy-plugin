@@ -27,8 +27,10 @@
 package com.github.badamowicz.maven.ojaudit.plugin.executor;
 
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.Properties;
 
+import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -45,13 +47,19 @@ import com.github.badamowicz.maven.ojaudit.plugin.mojos.OjdeployMojo;
  */
 public class OjdeployExecutor {
 
-    static final Logger         LOG        = Logger.getLogger(OjdeployExecutor.class);
+    private static final String OJDEPLOY_BIN_LIN = "ojdeploy";
 
-    private static final String PROPS_FILE = "executor.properties";
+    private static final String OJDEPLOY_BIN_WIN = "ojdeploy.exe";
 
-    private Properties          props      = null;
-    private OjdeployMojo        mojo       = null;
-    private boolean             dryRun     = false;
+    static final Logger         LOG              = Logger.getLogger(OjdeployExecutor.class);
+
+    private static final String PROPS_FILE       = "executor.properties";
+
+    private Properties          props            = null;
+    private OjdeployMojo        mojo             = null;
+    private boolean             dryRun           = false;
+    private CommandLine         cmdLine          = null;
+    private String              ojdeployBinary   = null;
 
     /**
      * Constructor performs necessary initializations of internal data and mappings.
@@ -61,16 +69,188 @@ public class OjdeployExecutor {
     public OjdeployExecutor() throws OjdeployExecutionExeption {
 
         initProperties();
+        initOjdeployBinary();
     }
 
     /**
-     * Actually executes the ojdeploy command with all the arguments provided by the given mojo.
+     * Initialize the name of the ojdeploy binary depending on the operating system used. Currently only Windows and Linux are
+     * supported.
+     */
+    void initOjdeployBinary() {
+
+        String osName = null;
+
+        osName = System.getProperty("os.name");
+
+        if (osName.toLowerCase().contains("win"))
+            setOjdeployBinary(OJDEPLOY_BIN_WIN);
+        else if (osName.toLowerCase().contains("linux"))
+            setOjdeployBinary(OJDEPLOY_BIN_LIN);
+        else
+            throw new OjdeployExecutionExeption("Operating system" + osName + " is not supported!");
+
+        LOG.debug("Initialized ojdeploy binary for operating system " + osName + " with '" + getOjdeployBinary() + "'.");
+    }
+
+    /**
+     * Actually executes the ojdeploy command with all the arguments provided by the given Mojo.
      * 
      * @param mojo The {@link OjdeployMojo} whose parameters will be used to initialize the ojdeploy command line.
      * @param dryRun If set to true, no action will be taken. Instead only the command line as would have been executed will be
      *        shown.
      */
     public void execute(OjdeployMojo mojo, boolean dryRun) {
+
+        try {
+            setMojo(mojo);
+            setDryRun(dryRun);
+
+            prepareCommandLine();
+
+            // execute command if not dry run
+        } catch (Exception e) {
+
+            throw new OjdeployExecutionExeption("Was not able to execute ojdeploy!\n", e);
+        }
+
+    }
+
+    /**
+     * Prepare the command line used internally for being executed later.
+     */
+    void prepareCommandLine() {
+
+        String executable = null;
+
+        LOG.debug("Start initializing ojdeploy command line.");
+
+        if (getMojo().getJdevBinPath() != null)
+            executable = getMojo().getJdevBinPath().getAbsolutePath() + "/" + getOjdeployBinary();
+        else
+            executable = getOjdeployBinary();
+
+        setCmdLine(new CommandLine(executable));
+        LOG.debug("Base command initialized with: " + executable);
+
+        if (getMojo().getBuildFile() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("buildFile"));
+            getCmdLine().addArgument(getMojo().getBuildFile().getAbsolutePath());
+
+        } else if (getMojo().getBuildFileSchema() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("buildFileSchema"));
+            getCmdLine().addArgument(getMojo().getBuildFileSchema().toString());
+
+        } else if (getMojo().getProfile() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("profile"));
+            getCmdLine().addArgument(getMojo().getProfile().getAbsolutePath());
+        }
+
+        if (getMojo().getWorkspaceFile() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("workspaceFile"));
+            getCmdLine().addArgument(getMojo().getWorkspaceFile().getAbsolutePath());
+        }
+
+        if (getMojo().getOutputFile() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("outputFile"));
+            getCmdLine().addArgument(getMojo().getOutputFile().getAbsolutePath());
+        }
+
+        if (getMojo().getProject() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("project"));
+            getCmdLine().addArgument(getMojo().getProject());
+        }
+
+        if (getMojo().getBaseDir() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("baseDir"));
+            getCmdLine().addArgument(getMojo().getBaseDir().getAbsolutePath());
+        }
+
+        if (getMojo().getNocompile() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("nocompile"));
+            getCmdLine().addArgument(getMojo().getNocompile().toString());
+        }
+
+        if (getMojo().getNodependents() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("nodependents"));
+            getCmdLine().addArgument(getMojo().getNodependents().toString());
+        }
+
+        if (getMojo().getClean() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("clean"));
+            getCmdLine().addArgument(getMojo().getClean().toString());
+        }
+
+        if (getMojo().getNodatasources() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("nodatasources"));
+            getCmdLine().addArgument(getMojo().getClean().toString());
+        }
+
+        if (getMojo().getForceRewrite() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("forceRewrite"));
+            getCmdLine().addArgument(getMojo().getForceRewrite().toString());
+        }
+
+        if (getMojo().getUpdateWebxmlEJBRefs() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("updateWebxmlEJBRefs"));
+            getCmdLine().addArgument(getMojo().getUpdateWebxmlEJBRefs().toString());
+        }
+
+        if (getMojo().getStatusLogFile() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("statusLogFile"));
+            getCmdLine().addArgument(getMojo().getStatusLogFile().getAbsolutePath());
+        }
+
+        if (getMojo().getTimeout() != null) {
+
+            getCmdLine().addArgument(getProps().getProperty("timeout"));
+            getCmdLine().addArgument(getMojo().getTimeout().toString());
+        }
+
+        addDefines();
+
+        LOG.debug("Finished initializing ojdeploy command line call with: " + getCmdLine().toString());
+    }
+
+    /**
+     * Add the 'defines' argument to the command line if available.
+     */
+    private void addDefines() {
+
+        Iterator<String> iterDefines = null;
+        StringBuilder builder = null;
+
+        if (getMojo().getDefines() != null && getMojo().getDefines().size() > 0) {
+
+            getCmdLine().addArgument(getProps().getProperty("defines"));
+
+            iterDefines = getMojo().getDefines().iterator();
+            builder = new StringBuilder("'");
+
+            while (iterDefines.hasNext()) {
+
+                builder.append(iterDefines.next());
+
+                if (iterDefines.hasNext())
+                    builder.append(",");
+            }
+
+            builder.append("'");
+            getCmdLine().addArgument(builder.toString());
+        }
 
     }
 
@@ -126,5 +306,25 @@ public class OjdeployExecutor {
     void setDryRun(boolean dryRun) {
 
         this.dryRun = dryRun;
+    }
+
+    CommandLine getCmdLine() {
+
+        return cmdLine;
+    }
+
+    void setCmdLine(CommandLine cmdLine) {
+
+        this.cmdLine = cmdLine;
+    }
+
+    String getOjdeployBinary() {
+
+        return ojdeployBinary;
+    }
+
+    void setOjdeployBinary(String ojdeployBinary) {
+
+        this.ojdeployBinary = ojdeployBinary;
     }
 }

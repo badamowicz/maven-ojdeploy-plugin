@@ -30,9 +30,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 
+import org.apache.commons.exec.CommandLine;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.github.badamowicz.maven.ojaudit.plugin.helper.AbstractOjdeployHelper;
 import com.github.badamowicz.maven.ojaudit.plugin.mojos.OjdeployMojo;
 
 /**
@@ -41,36 +43,82 @@ import com.github.badamowicz.maven.ojaudit.plugin.mojos.OjdeployMojo;
  * @author bernd
  *
  */
-public class OjdeployExecutorTest {
+public class OjdeployExecutorTest extends AbstractOjdeployHelper {
 
-    private OjdeployExecutor     executor = null;
-    private OjdeployMojo         mojo     = null;
-    private static final boolean DRY_RUN  = true;
+    private OjdeployExecutor     executorSimple = null;
+    private OjdeployExecutor     executorFilled = null;
+    private OjdeployMojo         mojoSimple     = null;
+    private static final boolean DRY_RUN        = true;
+    private CommandLine          cmdLine        = null;
 
     @BeforeClass
     public void beforeClass() {
 
-        mojo = new OjdeployMojo();
-        executor = new OjdeployExecutor();
-        executor.setDryRun(DRY_RUN);
-        executor.setMojo(mojo);
+        prepareDefaultMojo();
+
+        mojoSimple = new OjdeployMojo();
+        cmdLine = new CommandLine("gedoens.sh");
+
+        executorSimple = new OjdeployExecutor();
+        executorSimple.setDryRun(DRY_RUN);
+        executorSimple.setMojo(mojoSimple);
+        executorSimple.setCmdLine(cmdLine);
+
+        executorFilled = new OjdeployExecutor();
+        executorFilled.setMojo(mojo);
+        executorFilled.setDryRun(true);
+    }
+
+    // FIXME: check if cmd line is really as expected
+    @Test
+    public void prepareCommandLine() {
+
+        String expectedCmdLine = null;
+
+        executorFilled.prepareCommandLine();
+        expectedCmdLine = executorFilled.getCmdLine().toString();
+        assertNotNull(expectedCmdLine, "Command line not initialized!");
+        assertEquals(
+                expectedCmdLine,
+                "[/some/path/ojdeploy, -buildfile, /some/build.file, -workspace, /some/workspace.jws, -outputfile, /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/out.txt, -project, some.jpr, -basedir, /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/., -nocompile, true, -nodependents, false, -clean, true, -nodatasources, true, -forcerewrite, true, -updatewebxmlejbrefs, false, -statuslogfile, /some/path/status.log, -timeout, 300, -define, key1=value1,key2=value2]");
+    }
+
+    @Test
+    public void getOjdeployBinary() {
+
+        String osName = null;
+
+        osName = System.getProperty("os.name");
+        executorSimple.initOjdeployBinary();
+
+        if (osName.toLowerCase().contains("win"))
+            assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy.exe");
+        else if (osName.toLowerCase().contains("linux"))
+            assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy");
+
     }
 
     @Test
     public void getMojo() {
 
-        assertSame(executor.getMojo(), mojo, "Not the same Mojo returned!");
+        assertSame(executorSimple.getMojo(), mojoSimple, "Not the same Mojo returned!");
     }
 
     @Test
     public void getProps() {
 
-        assertNotNull(executor.getProps(), "Properties not initialized!");
+        assertNotNull(executorSimple.getProps(), "Properties not initialized!");
     }
 
     @Test
     public void isDryRun() {
 
-        assertEquals(executor.isDryRun(), DRY_RUN, "Dry run value set wrong!");
+        assertEquals(executorSimple.isDryRun(), DRY_RUN, "Dry run value set wrong!");
+    }
+
+    @Test
+    public void getCmdLine() {
+
+        assertSame(executorSimple.getCmdLine(), cmdLine, "Wrong command line object returned!");
     }
 }

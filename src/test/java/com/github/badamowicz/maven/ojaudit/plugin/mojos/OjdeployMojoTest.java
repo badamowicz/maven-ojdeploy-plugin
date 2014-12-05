@@ -30,14 +30,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.github.badamowicz.maven.ojaudit.plugin.helper.AbstractOjdeployHelper;
 
 /**
  * Test cases for {@link OjdeployMojo}.
@@ -45,64 +44,16 @@ import org.testng.annotations.Test;
  * @author bernd
  *
  */
-public class OjdeployMojoTest {
+public class OjdeployMojoTest extends AbstractOjdeployHelper {
 
-    private static final File              JDEV_BIN_PATH     = new File("/some/path");
-    private static final File              WORKSPACE_FILE    = new File("/some/workspace.jws");
-    private static final File              BUILD_FILE        = new File("/some/build.file");
-    private static final File              PROFILE_FILE      = new File("profile.file");
-    private static final String            PROJECT           = "some.jpr";
-    private static final File              BASE_DIR          = new File(".");
-    private static final File              OUTFILE           = new File("out.txt");
-    private static final Boolean           NOCOMPILE         = Boolean.TRUE;
-    private static final Boolean           NODEPENDENTS      = Boolean.FALSE;
-    private static final Boolean           CLEAN             = Boolean.TRUE;
-    private static final Boolean           NODATASOURCES     = Boolean.FALSE;
-    private static final Boolean           FORCEWRITE        = Boolean.TRUE;
-    private static final Boolean           UPDATE_WEB_XML    = Boolean.FALSE;
-
-    private static final ArrayList<String> DEFINES           = new ArrayList<String>() {
-                                                                 private static final long serialVersionUID = -3675484013465075644L;
-
-                                                                 {
-                                                                     add("key1=value1");
-                                                                     add("key2=value2");
-                                                                 }
-                                                             };
-
-    private static final File              STATUS_LOG_FILE   = new File("/some/path/status.log");
-    private static final Long              TIMEOUT           = 300l;
-    private static final Boolean           BUILD_FILE_SCHEMA = Boolean.FALSE;
-    private static final Boolean           DRY_RUN           = Boolean.TRUE;
-
-    private OjdeployMojo                   mojo              = null;
-    private OjdeployMojo                   messyMojo1        = null;
-    private OjdeployMojo                   messyMojo2        = null;
-    private OjdeployMojo                   messyMojo3        = null;
+    private OjdeployMojo messyMojo1 = null;
+    private OjdeployMojo messyMojo2 = null;
+    private OjdeployMojo messyMojo3 = null;
 
     @BeforeClass
     public void beforeClass() {
 
-        mojo = new OjdeployMojo();
-        mojo.setBaseDir(BASE_DIR);
-        mojo.setBuildFile(BUILD_FILE);
-        mojo.setClean(CLEAN);
-        mojo.setDefines(DEFINES);
-        mojo.setForceRewrite(FORCEWRITE);
-        mojo.setJdevBinPath(JDEV_BIN_PATH);
-        mojo.setNocompile(NOCOMPILE);
-        mojo.setNodatasources(NODATASOURCES);
-        mojo.setNodependents(NODEPENDENTS);
-        mojo.setOutputFile(OUTFILE);
-        mojo.setProfile(PROFILE_FILE);
-        mojo.setProject(PROJECT);
-        mojo.setStatusLogFile(STATUS_LOG_FILE);
-        mojo.setTimeout(TIMEOUT);
-        mojo.setBuildFileSchema(BUILD_FILE_SCHEMA);
-        mojo.setUpdateWebxmlEJBRefs(UPDATE_WEB_XML);
-        mojo.setWorkspaceFile(WORKSPACE_FILE);
-        mojo.setDryRun(DRY_RUN);
-
+        prepareDefaultMojo();
         prepareMessyMojos();
     }
 
