@@ -1,0 +1,152 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.badamowicz</groupId>
+  <artifactId>maven-ojdeploy-plugin</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>Maven OJDeploy Plugin</name>
+  <description>
+    Maven Plugin for executing JDeveloper's ojdeploy executable without Ant.
+  </description>
+  <inceptionYear>2014</inceptionYear>
+  <url>https://github.com/badamowicz/TODO</url>
+  
+  <licenses>
+    <license>
+      <name>GNU GENERAL PUBLIC LICENSE Version 3</name>
+      <url>http://www.gnu.org/licenses/gpl.txt</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git@github.com:badamowicz/TODO.git</connection>
+    <developerConnection>scm:git:git@github.com:badamowicz/TODO.git</developerConnection>
+    <url>git@github.com:badamowicz/TODO.git</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sonar.exclusions>
+      **/com/github/badamowicz/TODO/*Exception.java,
+      **/com/github/badamowicz/TODO.java
+    </sonar.exclusions>
+  </properties>
+
+  <developers>
+    <developer>
+      <id>badamowicz</id>
+      <name>Bernd Adamowicz</name>
+      <email>info@bernd-adamowicz.de</email>
+      <url>http://www.bernd-adamowicz.de</url>
+      <organization>Softwaremanagement</organization>
+      <organizationUrl>http://www.bernd-adamowicz.de</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+2</timezone>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>3.2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>6.8.7</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <configuration>
+          <goalPrefix>sonar-hla</goalPrefix>
+          <useJava5>true</useJava5>
+          <detail>true</detail>
+        </configuration>
+        <executions>
+          <execution>
+            <id>generated-helpmojo</id>
+            <goals>
+              <goal>helpmojo</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>it</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <configuration>
+              <projectsDirectory>src/it</projectsDirectory>
+              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+              <pomIncludes>
+                <pomInclude>*/pom.xml</pomInclude>
+              </pomIncludes>
+              <settingsFile>src/it/settings.xml</settingsFile>
+              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+              <postBuildHookScript>verify.groovy</postBuildHookScript>
+              <addTestClassPath>true</addTestClassPath>
+              <goals>
+                <goal>install</goal>
+              </goals>
+            </configuration>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>install</goal>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
