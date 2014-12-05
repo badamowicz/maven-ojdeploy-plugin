@@ -180,7 +180,7 @@ public class OjdeployMojo extends AbstractMojo {
     }
 
     /**
-     * Check if mutual exclusive command are given at the same run.
+     * Check if mutual exclusive commands are given in the same run.
      * 
      * @throws MojoExecutionException If more than one mutual exclusive command is given.
      */
