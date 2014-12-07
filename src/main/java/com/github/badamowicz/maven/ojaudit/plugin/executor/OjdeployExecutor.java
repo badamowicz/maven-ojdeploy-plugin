@@ -26,11 +26,17 @@
  */
 package com.github.badamowicz.maven.ojaudit.plugin.executor;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -104,15 +110,50 @@ public class OjdeployExecutor {
         try {
             setMojo(mojo);
             setDryRun(dryRun);
-
             prepareCommandLine();
 
-            // execute command if not dry run
+            if (isDryRun()) {
+
+                LOG.info("Dry run option is set. Would execute this command:");
+                LOG.info(getCmdLine());
+
+            } else {
+
+                exec();
+            }
+
         } catch (Exception e) {
 
             throw new OjdeployExecutionExeption("Was not able to execute ojdeploy!\n", e);
         }
+    }
 
+    /**
+     * Actually execute the ojdeploy command which has been prepared before.
+     * 
+     * @throws IOException if some stream error occurred.
+     * @throws ExecuteException if execution of ojdeploy failed.
+     */
+    private void exec() throws ExecuteException, IOException {
+
+        ExecuteWatchdog watchdog = null;
+        OutputStream os = null;
+        PumpStreamHandler pStreamHandler = null;
+        DefaultExecutor executor = null;
+        int exitVal = -1;
+
+        LOG.info("Start executing ojdeploy now with command:");
+        LOG.info(getCmdLine());
+        watchdog = new ExecuteWatchdog(Long.valueOf(getProps().getProperty("watchdog.timeout")));
+        os = System.out;
+        pStreamHandler = new PumpStreamHandler(os);
+        executor = new DefaultExecutor();
+        executor.setWatchdog(watchdog);
+        executor.setStreamHandler(pStreamHandler);
+        executor.setExitValue(Integer.valueOf(getProps().getProperty("exit.value")));
+        exitVal = executor.execute(getCmdLine());
+        os.flush();
+        LOG.info("Finished executing ojdeploy with exit value: " + exitVal);
     }
 
     /**
