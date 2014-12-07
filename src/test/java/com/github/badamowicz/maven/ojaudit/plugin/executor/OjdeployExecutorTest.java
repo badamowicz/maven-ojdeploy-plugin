@@ -54,6 +54,7 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
     private OjdeployMojo         mojoSimple     = null;
     private static final boolean DRY_RUN        = true;
     private CommandLine          cmdLine        = null;
+    private static final long    TIMEOUT        = 30001l;
 
     @BeforeClass
     public void beforeClass() {
@@ -67,6 +68,7 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         executorSimple.setDryRun(DRY_RUN);
         executorSimple.setMojo(mojoSimple);
         executorSimple.setCmdLine(cmdLine);
+        executorSimple.setTimeout(TIMEOUT);
 
         executorFilled = new OjdeployExecutor();
         executorFilled.setMojo(mojo);
@@ -104,6 +106,12 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         else if (osName.toLowerCase().contains("linux"))
             assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy");
 
+    }
+
+    @Test
+    public void getTimeout() {
+
+        assertEquals(executorSimple.getTimeout(), TIMEOUT, "Timout value not set as expected!");
     }
 
     @Test

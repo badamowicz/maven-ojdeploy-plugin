@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.badamowicz</groupId>
+  <artifactId>Ojdeploy-IT</artifactId>
+  <version>@project.version@</version>
+  <packaging>pom</packaging>
+
+  <description>
+    IT for executing ojdeploy.
+  </description>
+
+  <name>Ojdeploy-IT</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.badamowicz</groupId>
+        <artifactId>ojdeploy-maven-plugin</artifactId>
+        <version>@project.version@</version>
+        <configuration>
+          <dryRun>false</dryRun>
+          <jdevBinPath>/opt/Oracle/Middleware/jdeveloper/jdev/bin</jdevBinPath>
+          <workspaceFile>/home/bernd/THEMEN/BA/DEV/ADF-Eval/Application1.jws</workspaceFile>
+          <!-- <buildFile></buildFile> -->
+          <outputFile>report.txt</outputFile>
+          <profile>ViewController</profile>
+          <!-- <project></project> -->
+          <!-- <buildFileSchema></buildFileSchema> -->
+          <baseDir>.</baseDir>
+          <nocompile>false</nocompile>
+          <nodependents>false</nodependents>
+          <clean>true</clean>
+          <nodatasources>false</nodatasources>
+          <forceRewrite>true</forceRewrite>
+          <updateWebxmlEJBRefs>true</updateWebxmlEJBRefs>
+          <defines></defines>
+          <statusLogFile>status.log</statusLogFile>
+          <timeout></timeout>
+        </configuration>
+        <executions>
+          <execution>
+            <id>execute</id>
+            <goals>
+              <goal>ojdeploy</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

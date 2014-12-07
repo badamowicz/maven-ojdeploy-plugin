@@ -66,6 +66,7 @@ public class OjdeployExecutor {
     private boolean             dryRun           = false;
     private CommandLine         cmdLine          = null;
     private String              ojdeployBinary   = null;
+    private long                timeout          = 30000l;
 
     /**
      * Constructor performs necessary initializations of internal data and mappings.
@@ -105,7 +106,7 @@ public class OjdeployExecutor {
      * @param dryRun If set to true, no action will be taken. Instead only the command line as would have been executed will be
      *        shown.
      */
-    public void execute(OjdeployMojo mojo, boolean dryRun) {
+    public void execute(OjdeployMojo mojo, boolean dryRun, long timeout) {
 
         try {
             setMojo(mojo);
@@ -144,7 +145,7 @@ public class OjdeployExecutor {
 
         LOG.info("Start executing ojdeploy now with command:");
         LOG.info(getCmdLine());
-        watchdog = new ExecuteWatchdog(Long.valueOf(getProps().getProperty("watchdog.timeout")));
+        watchdog = new ExecuteWatchdog(getTimeout());
         os = System.out;
         pStreamHandler = new PumpStreamHandler(os);
         executor = new DefaultExecutor();
@@ -367,5 +368,15 @@ public class OjdeployExecutor {
     void setOjdeployBinary(String ojdeployBinary) {
 
         this.ojdeployBinary = ojdeployBinary;
+    }
+
+    long getTimeout() {
+
+        return timeout;
+    }
+
+    void setTimeout(long timeout) {
+
+        this.timeout = timeout;
     }
 }

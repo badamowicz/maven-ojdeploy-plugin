@@ -181,7 +181,7 @@ public class OjdeployMojo extends AbstractMojo {
     /**
      * Time in seconds allowed for each deployment task.
      * 
-     * @parameter property="timeout" default-value="Long.MIN_VALUE"
+     * @parameter property="timeout" default-value="30000"
      */
     private Long             timeout             = null;
 
@@ -191,7 +191,7 @@ public class OjdeployMojo extends AbstractMojo {
 
             checkMutualExclusives();
             executor = new OjdeployExecutor();
-            executor.execute(this, getDryRun());
+            executor.execute(this, getDryRun(), getTimeout());
 
         } catch (Exception e) {
 
