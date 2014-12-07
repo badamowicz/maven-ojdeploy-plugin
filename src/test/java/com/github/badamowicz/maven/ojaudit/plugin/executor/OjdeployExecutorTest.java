@@ -29,6 +29,10 @@ package com.github.badamowicz.maven.ojaudit.plugin.executor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
 import org.testng.annotations.BeforeClass;
@@ -72,16 +76,19 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
     @Test
     public void prepareCommandLine() {
 
-        String expectedCmdLine = null;
+        String cmdLine = null;
+        Pattern expected = null;
+        Matcher matcher = null;
 
         executorFilled.prepareCommandLine();
-        expectedCmdLine = executorFilled.getCmdLine().toString();
-        assertNotNull(expectedCmdLine, "Command line not initialized!");
-        assertEquals(
-                expectedCmdLine,
-                "/some/path/ojdeploy -buildfile /some/build.file -workspace /some/workspace.jws -outputfile /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/out.txt -project some.jpr -basedir /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/. -nocompile true -nodependents false -clean true -nodatasources true -forcerewrite true -updatewebxmlejbrefs false -statuslogfile /some/path/status.log -timeout 300 -define key1=value1,key2=value2");
+        cmdLine = executorFilled.getCmdLine().toString();
+        assertNotNull(cmdLine, "Command line not initialized!");
 
-        // FIXME: check if cmd line is really as expected
+        expected = Pattern
+                .compile("/some/path/ojdeploy -buildfile /some/build.file -workspace /some/workspace.jws -outputfile .*/maven-ojdeploy-plugin/out.txt -project some.jpr -basedir .*/maven-ojdeploy-plugin/. -nocompile true -nodependents false -clean true -nodatasources true -forcerewrite true -updatewebxmlejbrefs false -statuslogfile /some/path/status.log -timeout 300 -define key1=value1,key2=value2");
+        matcher = expected.matcher(cmdLine);
+
+        assertTrue(matcher.matches(), "Command line not generated as expected!");
     }
 
     @Test
