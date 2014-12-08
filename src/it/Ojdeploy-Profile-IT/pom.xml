@@ -13,9 +13,6 @@
 
   <name>Ojdeploy-Profile-IT</name>
 
-
-<!-- /opt/Oracle/Middleware/jdeveloper/jdev/bin/ojdeploy -profile ShuttleDemo_application1 -workspace /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/target/it/Ojdeploy-Profile-IT/ShuttleDemo/ShuttleDemo.jws -basedir /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/target/it/Ojdeploy-Profile-IT  -statuslogfile /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/target/it/Ojdeploy-Profile-IT/status.xml -timeout 30000 -->
-
   <build>
     <plugins>
       <plugin>
@@ -26,11 +23,8 @@
           <dryRun>false</dryRun>
           <jdevBinPath>/opt/Oracle/Middleware/jdeveloper/jdev/bin</jdevBinPath>
           <workspaceFile>ShuttleDemo/ShuttleDemo.jws</workspaceFile>
-          <!-- <buildFile></buildFile> -->
           <outputFile></outputFile>
           <profile>ShuttleDemo_application1</profile>
-          <!-- <project></project> -->
-          <!-- <buildFileSchema></buildFileSchema> -->
           <baseDir>.</baseDir>
           <nocompile>false</nocompile>
           <nodependents>false</nodependents>
