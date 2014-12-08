@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.badamowicz</groupId>
-  <artifactId>Ojdeploy-IT</artifactId>
+  <artifactId>Ojdeploy-Profile-IT</artifactId>
   <version>@project.version@</version>
   <packaging>pom</packaging>
 
@@ -11,7 +11,10 @@
     IT for executing ojdeploy.
   </description>
 
-  <name>Ojdeploy-IT</name>
+  <name>Ojdeploy-Profile-IT</name>
+
+
+<!-- /opt/Oracle/Middleware/jdeveloper/jdev/bin/ojdeploy -profile ShuttleDemo_application1 -workspace /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/target/it/Ojdeploy-Profile-IT/ShuttleDemo/ShuttleDemo.jws -basedir /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/target/it/Ojdeploy-Profile-IT  -statuslogfile /home/bernd/THEMEN/BA/DEV/maven-ojdeploy-plugin/target/it/Ojdeploy-Profile-IT/status.xml -timeout 30000 -->
 
   <build>
     <plugins>
@@ -22,21 +25,21 @@
         <configuration>
           <dryRun>false</dryRun>
           <jdevBinPath>/opt/Oracle/Middleware/jdeveloper/jdev/bin</jdevBinPath>
-          <workspaceFile>/home/bernd/THEMEN/BA/DEV/ADF-Eval/Application1.jws</workspaceFile>
+          <workspaceFile>ShuttleDemo/ShuttleDemo.jws</workspaceFile>
           <!-- <buildFile></buildFile> -->
-          <outputFile>report.txt</outputFile>
-          <profile>ViewController</profile>
+          <outputFile></outputFile>
+          <profile>ShuttleDemo_application1</profile>
           <!-- <project></project> -->
           <!-- <buildFileSchema></buildFileSchema> -->
           <baseDir>.</baseDir>
           <nocompile>false</nocompile>
           <nodependents>false</nodependents>
-          <clean>true</clean>
+          <clean>false</clean>
           <nodatasources>false</nodatasources>
-          <forceRewrite>true</forceRewrite>
-          <updateWebxmlEJBRefs>true</updateWebxmlEJBRefs>
+          <forceRewrite>false</forceRewrite>
+          <updateWebxmlEJBRefs>false</updateWebxmlEJBRefs>
           <defines></defines>
-          <statusLogFile>status.log</statusLogFile>
+          <statusLogFile>status.xml</statusLogFile>
           <timeout></timeout>
         </configuration>
         <executions>

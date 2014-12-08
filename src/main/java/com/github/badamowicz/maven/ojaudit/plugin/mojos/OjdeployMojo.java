@@ -97,7 +97,7 @@ public class OjdeployMojo extends AbstractMojo {
      * @parameter property="profile"
      * @required
      */
-    private File             profile             = null;
+    private String           profile             = null;
 
     /**
      * Name of the JDeveloper Project within the .jws where the Profile can be found. If omitted, the Profile is assumed to be in
@@ -124,42 +124,42 @@ public class OjdeployMojo extends AbstractMojo {
     /**
      * Skip compilation of Project or Workspace.
      * 
-     * @parameter property="nocompile" default-value="false"
+     * @parameter property="nocompile"
      */
     private Boolean          nocompile           = null;
 
     /**
      * Do not deploy dependent profiles.
      * 
-     * @parameter property="nodependents" default-value="false"
+     * @parameter property="nodependents"
      */
     private Boolean          nodependents        = null;
 
     /**
      * Clean output directories before compiling.
      * 
-     * @parameter property="clean" default-value="false"
+     * @parameter property="clean"
      */
     private Boolean          clean               = null;
 
     /**
      * Do not include datasources from IDE.
      * 
-     * @parameter property="nodatasources" default-value="false"
+     * @parameter property="nodatasources"
      */
     private Boolean          nodatasources       = null;
 
     /**
      * Rewrite output file even if it is identical to existing file.
      * 
-     * @parameter property="forceRewrite" default-value="false"
+     * @parameter property="forceRewrite"
      */
     private Boolean          forceRewrite        = null;
 
     /**
      * Update EJB references in web.xml.
      * 
-     * @parameter property="updateWebxmlEJBRefs" default-value="false"
+     * @parameter property="updateWebxmlEJBRefs"
      */
     private Boolean          updateWebxmlEJBRefs = null;
 
@@ -233,7 +233,7 @@ public class OjdeployMojo extends AbstractMojo {
         this.outputFile = outputFile;
     }
 
-    public void setProfile(File profile) {
+    public void setProfile(String profile) {
 
         this.profile = profile;
     }
@@ -318,7 +318,7 @@ public class OjdeployMojo extends AbstractMojo {
         return outputFile;
     }
 
-    public File getProfile() {
+    public String getProfile() {
 
         return profile;
     }

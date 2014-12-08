@@ -70,10 +70,10 @@ public class OjdeployMojoTest extends AbstractOjdeployHelper {
         messyMojo1.setBuildFile(BUILD_FILE);
 
         messyMojo2.setBuildFileSchema(BUILD_FILE_SCHEMA);
-        messyMojo2.setProfile(PROFILE_FILE);
+        messyMojo2.setProfile(PROFILE);
 
         messyMojo3.setBuildFile(BUILD_FILE);
-        messyMojo3.setProfile(PROFILE_FILE);
+        messyMojo3.setProfile(PROFILE);
     }
 
     @DataProvider(name = "MessyMojoProvider")
@@ -164,7 +164,7 @@ public class OjdeployMojoTest extends AbstractOjdeployHelper {
     @Test
     public void getProfile() {
 
-        assertEquals(mojo.getProfile(), PROFILE_FILE, "Profile file not set as expected!");
+        assertEquals(mojo.getProfile(), PROFILE, "Profile file not set as expected!");
     }
 
     @Test

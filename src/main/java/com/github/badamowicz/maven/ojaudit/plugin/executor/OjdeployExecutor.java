@@ -26,9 +26,10 @@
  */
 package com.github.badamowicz.maven.ojaudit.plugin.executor;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -138,7 +139,7 @@ public class OjdeployExecutor {
     private void exec() throws ExecuteException, IOException {
 
         ExecuteWatchdog watchdog = null;
-        OutputStream os = null;
+        FileOutputStream fos = null;
         PumpStreamHandler pStreamHandler = null;
         DefaultExecutor executor = null;
         int exitVal = -1;
@@ -146,14 +147,15 @@ public class OjdeployExecutor {
         LOG.info("Start executing ojdeploy now with command:");
         LOG.info(getCmdLine());
         watchdog = new ExecuteWatchdog(getTimeout());
-        os = System.out;
-        pStreamHandler = new PumpStreamHandler(os);
+        fos = new FileOutputStream(new File(getProps().getProperty("ojdeploy.build.log.file")));
+        pStreamHandler = new PumpStreamHandler(fos);
         executor = new DefaultExecutor();
         executor.setWatchdog(watchdog);
         executor.setStreamHandler(pStreamHandler);
         executor.setExitValue(Integer.valueOf(getProps().getProperty("exit.value")));
         exitVal = executor.execute(getCmdLine());
-        os.flush();
+        fos.flush();
+        fos.close();
         LOG.info("Finished executing ojdeploy with exit value: " + exitVal);
     }
 
@@ -187,7 +189,7 @@ public class OjdeployExecutor {
         } else if (getMojo().getProfile() != null) {
 
             getCmdLine().addArgument(getProps().getProperty("profile"));
-            getCmdLine().addArgument(getMojo().getProfile().getAbsolutePath());
+            getCmdLine().addArgument(getMojo().getProfile());
         }
 
         if (getMojo().getWorkspaceFile() != null) {
@@ -214,40 +216,34 @@ public class OjdeployExecutor {
             getCmdLine().addArgument(getMojo().getBaseDir().getAbsolutePath());
         }
 
-        if (getMojo().getNocompile() != null) {
+        if (getMojo().getNocompile() != null && getMojo().getNocompile().booleanValue() == true) {
 
             getCmdLine().addArgument(getProps().getProperty("nocompile"));
-            getCmdLine().addArgument(getMojo().getNocompile().toString());
         }
 
-        if (getMojo().getNodependents() != null) {
+        if (getMojo().getNodependents() != null && getMojo().getNodependents().booleanValue() == true) {
 
             getCmdLine().addArgument(getProps().getProperty("nodependents"));
-            getCmdLine().addArgument(getMojo().getNodependents().toString());
         }
 
-        if (getMojo().getClean() != null) {
+        if (getMojo().getClean() != null && getMojo().getClean().booleanValue() == true) {
 
             getCmdLine().addArgument(getProps().getProperty("clean"));
-            getCmdLine().addArgument(getMojo().getClean().toString());
         }
 
-        if (getMojo().getNodatasources() != null) {
+        if (getMojo().getNodatasources() != null && getMojo().getNodatasources().booleanValue() == true) {
 
             getCmdLine().addArgument(getProps().getProperty("nodatasources"));
-            getCmdLine().addArgument(getMojo().getClean().toString());
         }
 
-        if (getMojo().getForceRewrite() != null) {
+        if (getMojo().getForceRewrite() != null && getMojo().getForceRewrite().booleanValue() == true) {
 
             getCmdLine().addArgument(getProps().getProperty("forceRewrite"));
-            getCmdLine().addArgument(getMojo().getForceRewrite().toString());
         }
 
-        if (getMojo().getUpdateWebxmlEJBRefs() != null) {
+        if (getMojo().getUpdateWebxmlEJBRefs() != null && getMojo().getUpdateWebxmlEJBRefs().booleanValue() == true) {
 
             getCmdLine().addArgument(getProps().getProperty("updateWebxmlEJBRefs"));
-            getCmdLine().addArgument(getMojo().getUpdateWebxmlEJBRefs().toString());
         }
 
         if (getMojo().getStatusLogFile() != null) {

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.1"
+          xmlns:f="http://java.sun.com/jsf/core"
+          xmlns:h="http://java.sun.com/jsf/html"
+          xmlns:af="http://xmlns.oracle.com/adf/faces/rich">
+  <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+  <f:view>
+    <af:document id="d1">
+      <af:form id="f1">
+        <af:selectManyShuttle label="Label 1" id="sms1" leadingHeader="List" trailingHeader="Choice" simple="true">
+          <af:selectItem label="item1" value="b" id="si3"/>
+          <af:selectItem label="item2" value="d" id="si2"/>
+          <af:selectItem label="item3" value="f" id="si1"/>
+        </af:selectManyShuttle>
+       
+        <af:selectOrderShuttle label="Label 1" id="sos1" leadingHeader="List" trailingHeader="Choice" simple="true">
+          <af:selectItem label="item1" value="1" id="si5"/>
+          <af:selectItem label="item2" value="2" id="si4"/>
+        </af:selectOrderShuttle>
+      </af:form>
+    </af:document>
+  </f:view>
+</jsp:root>

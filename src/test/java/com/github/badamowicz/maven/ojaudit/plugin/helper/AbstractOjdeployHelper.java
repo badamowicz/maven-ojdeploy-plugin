@@ -42,16 +42,16 @@ public abstract class AbstractOjdeployHelper {
     protected static final File              JDEV_BIN_PATH     = new File("/some/path");
     protected static final File              WORKSPACE_FILE    = new File("/some/workspace.jws");
     protected static final File              BUILD_FILE        = new File("/some/build.file");
-    protected static final File              PROFILE_FILE      = new File("profile.file");
+    protected static final String            PROFILE           = "profileXY";
     protected static final String            PROJECT           = "some.jpr";
     protected static final File              BASE_DIR          = new File(".");
     protected static final File              OUTFILE           = new File("out.txt");
     protected static final Boolean           NOCOMPILE         = Boolean.TRUE;
-    protected static final Boolean           NODEPENDENTS      = Boolean.FALSE;
+    protected static final Boolean           NODEPENDENTS      = Boolean.TRUE;
     protected static final Boolean           CLEAN             = Boolean.TRUE;
-    protected static final Boolean           NODATASOURCES     = Boolean.FALSE;
+    protected static final Boolean           NODATASOURCES     = Boolean.TRUE;
     protected static final Boolean           FORCEWRITE        = Boolean.TRUE;
-    protected static final Boolean           UPDATE_WEB_XML    = Boolean.FALSE;
+    protected static final Boolean           UPDATE_WEB_XML    = Boolean.TRUE;
     protected static final ArrayList<String> DEFINES           = new ArrayList<String>() {
                                                                    private static final long serialVersionUID = -3675484013465075644L;
 
@@ -79,7 +79,7 @@ public abstract class AbstractOjdeployHelper {
         mojo.setNodatasources(NODATASOURCES);
         mojo.setNodependents(NODEPENDENTS);
         mojo.setOutputFile(OUTFILE);
-        mojo.setProfile(PROFILE_FILE);
+        mojo.setProfile(PROFILE);
         mojo.setProject(PROJECT);
         mojo.setStatusLogFile(STATUS_LOG_FILE);
         mojo.setTimeout(TIMEOUT);

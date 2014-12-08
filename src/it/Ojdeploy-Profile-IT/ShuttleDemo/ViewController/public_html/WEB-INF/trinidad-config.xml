@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trinidad-config xmlns="http://myfaces.apache.org/trinidad/config">
+
+  <skin-family>shuttledemo</skin-family>
+  <accessibility-mode>screenReader</accessibility-mode>
+  <accessibility-profile>high-contrast</accessibility-profile>
+</trinidad-config>
