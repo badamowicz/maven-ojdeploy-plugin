@@ -24,7 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.badamowicz.maven.ojaudit.plugin.executor;
+package com.github.badamowicz.maven.ojdeploy.plugin.executor;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,8 +41,8 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import com.github.badamowicz.maven.ojaudit.plugin.exeptions.OjdeployExecutionExeption;
-import com.github.badamowicz.maven.ojaudit.plugin.mojos.OjdeployMojo;
+import com.github.badamowicz.maven.ojdeploy.plugin.exceptions.OjdeployExecutionExeption;
+import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 
 /**
  * This class actually performs the ojdeploy commands. It provides sufficient mappings and error handling if things go wrong.

@@ -42,6 +42,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sonar.exclusions>
+      **/com/github/badamowicz/maven/ojdeploy/plugin/exceptions/*Exception.java,
     </sonar.exclusions>
   </properties>
 

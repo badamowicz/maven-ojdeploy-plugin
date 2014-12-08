@@ -24,7 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.badamowicz.maven.ojaudit.plugin.mojos;
+package com.github.badamowicz.maven.ojdeploy.plugin.mojos;
 
 import java.io.File;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import com.github.badamowicz.maven.ojaudit.plugin.executor.OjdeployExecutor;
+import com.github.badamowicz.maven.ojdeploy.plugin.executor.OjdeployExecutor;
 
 /**
  * Mojo is capable of executing OJDeploy commands. It will do nothing else than execute the <i>ojdeploy</i> binary on the command

@@ -24,7 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.badamowicz.maven.ojaudit.plugin.mojos;
+package com.github.badamowicz.maven.ojdeploy.plugin.mojos;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -36,7 +36,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.github.badamowicz.maven.ojaudit.plugin.helper.AbstractOjdeployHelper;
+import com.github.badamowicz.maven.ojdeploy.plugin.helper.AbstractOjdeployHelper;
+import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 
 /**
  * Test cases for {@link OjdeployMojo}.

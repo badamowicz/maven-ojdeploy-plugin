@@ -24,12 +24,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.badamowicz.maven.ojaudit.plugin.helper;
+package com.github.badamowicz.maven.ojdeploy.plugin.helper;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import com.github.badamowicz.maven.ojaudit.plugin.mojos.OjdeployMojo;
+import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 
 /**
  * Abstract super class which provides some fields an values for testing ojdeploy stuff.

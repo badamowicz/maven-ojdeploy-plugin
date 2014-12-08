@@ -24,7 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.badamowicz.maven.ojaudit.plugin.exeptions;
+package com.github.badamowicz.maven.ojdeploy.plugin.exceptions;
 
 /**
  * Exceptions of this type are thrown if it was not possible - for whatever reason - to execute an ojdeploy command.
