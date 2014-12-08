@@ -40,8 +40,8 @@ import com.github.badamowicz.maven.ojdeploy.plugin.executor.OjdeployExecutor;
  * line and hand over all the parameters and options given to this Mojo to this binary.
  * <p>
  * Basically this mojo takes all the options and parameters used by ojdeploy. Wherever possible, the names are not changed.
- * However, where applicable, Java style was introduced by using camel case. For example, the option <i>basedir</i> of ojaudit has
- * turned into the Mojo parameter <i>baseDir</i>.
+ * However, where applicable, Java style was introduced by using camel case. For example, the option <i>basedir</i> of ojdeploy
+ * has turned into the Mojo parameter <i>baseDir</i>.
  * <p>
  * Created Dec 4, 2014 02:42:05 AM by bernd
  * 
