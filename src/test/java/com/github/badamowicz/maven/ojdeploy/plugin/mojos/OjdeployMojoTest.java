@@ -30,14 +30,10 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.github.badamowicz.maven.ojdeploy.plugin.helper.AbstractOjdeployHelper;
-import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 
 /**
  * Test cases for {@link OjdeployMojo}.
@@ -47,46 +43,10 @@ import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
  */
 public class OjdeployMojoTest extends AbstractOjdeployHelper {
 
-    private OjdeployMojo messyMojo1 = null;
-    private OjdeployMojo messyMojo2 = null;
-    private OjdeployMojo messyMojo3 = null;
-
     @BeforeClass
     public void beforeClass() {
 
         prepareDefaultMojo();
-        prepareMessyMojos();
-    }
-
-    /**
-     * Provide some Mojos which are configured with mutual exclusive arguments.
-     */
-    private void prepareMessyMojos() {
-
-        messyMojo1 = new OjdeployMojo();
-        messyMojo2 = new OjdeployMojo();
-        messyMojo3 = new OjdeployMojo();
-
-        messyMojo1.setBuildFileSchema(BUILD_FILE_SCHEMA);
-        messyMojo1.setBuildFile(BUILD_FILE);
-
-        messyMojo2.setBuildFileSchema(BUILD_FILE_SCHEMA);
-        messyMojo2.setProfile(PROFILE);
-
-        messyMojo3.setBuildFile(BUILD_FILE);
-        messyMojo3.setProfile(PROFILE);
-    }
-
-    @DataProvider(name = "MessyMojoProvider")
-    public Object[][] provideMessyMojos() {
-
-        return new Object[][] { { messyMojo1, null }, { messyMojo2, null }, { messyMojo3, null } };
-    }
-
-    @Test(expectedExceptions = MojoExecutionException.class, dataProvider = "MessyMojoProvider")
-    public void checkMutualExclusives(OjdeployMojo mojo, Object notUsed) throws MojoExecutionException, MojoFailureException {
-
-        mojo.execute();
     }
 
     @Test

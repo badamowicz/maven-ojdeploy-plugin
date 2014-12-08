@@ -38,7 +38,6 @@ import org.apache.commons.exec.CommandLine;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.github.badamowicz.maven.ojdeploy.plugin.executor.OjdeployExecutor;
 import com.github.badamowicz.maven.ojdeploy.plugin.helper.AbstractOjdeployHelper;
 import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 

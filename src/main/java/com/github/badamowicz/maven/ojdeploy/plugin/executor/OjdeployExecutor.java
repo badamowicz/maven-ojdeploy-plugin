@@ -35,7 +35,6 @@ import java.util.Properties;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.IOUtils;
@@ -58,7 +57,7 @@ public class OjdeployExecutor {
 
     private static final String OJDEPLOY_BIN_WIN = "ojdeploy.exe";
 
-    static final Logger         LOG              = Logger.getLogger(OjdeployExecutor.class);
+    private static final Logger LOG              = Logger.getLogger(OjdeployExecutor.class);
 
     private static final String PROPS_FILE       = "executor.properties";
 
@@ -67,14 +66,12 @@ public class OjdeployExecutor {
     private boolean             dryRun           = false;
     private CommandLine         cmdLine          = null;
     private String              ojdeployBinary   = null;
-    private long                timeout          = 30000l;
+    private long                timeout          = 30000L;
 
     /**
      * Constructor performs necessary initializations of internal data and mappings.
-     * 
-     * @throws OjdeployExecutionExeption if initialization of internal data failed.
      */
-    public OjdeployExecutor() throws OjdeployExecutionExeption {
+    public OjdeployExecutor() {
 
         initProperties();
         initOjdeployBinary();
@@ -133,10 +130,9 @@ public class OjdeployExecutor {
     /**
      * Actually execute the ojdeploy command which has been prepared before.
      * 
-     * @throws IOException if some stream error occurred.
-     * @throws ExecuteException if execution of ojdeploy failed.
+     * @throws IOException if execution of external process failed.
      */
-    private void exec() throws ExecuteException, IOException {
+    private void exec() throws IOException {
 
         ExecuteWatchdog watchdog = null;
         FileOutputStream fos = null;
@@ -216,32 +212,32 @@ public class OjdeployExecutor {
             getCmdLine().addArgument(getMojo().getBaseDir().getAbsolutePath());
         }
 
-        if (getMojo().getNocompile() != null && getMojo().getNocompile().booleanValue() == true) {
+        if (getMojo().getNocompile() != null && getMojo().getNocompile().booleanValue()) {
 
             getCmdLine().addArgument(getProps().getProperty("nocompile"));
         }
 
-        if (getMojo().getNodependents() != null && getMojo().getNodependents().booleanValue() == true) {
+        if (getMojo().getNodependents() != null && getMojo().getNodependents().booleanValue()) {
 
             getCmdLine().addArgument(getProps().getProperty("nodependents"));
         }
 
-        if (getMojo().getClean() != null && getMojo().getClean().booleanValue() == true) {
+        if (getMojo().getClean() != null && getMojo().getClean().booleanValue()) {
 
             getCmdLine().addArgument(getProps().getProperty("clean"));
         }
 
-        if (getMojo().getNodatasources() != null && getMojo().getNodatasources().booleanValue() == true) {
+        if (getMojo().getNodatasources() != null && getMojo().getNodatasources().booleanValue()) {
 
             getCmdLine().addArgument(getProps().getProperty("nodatasources"));
         }
 
-        if (getMojo().getForceRewrite() != null && getMojo().getForceRewrite().booleanValue() == true) {
+        if (getMojo().getForceRewrite() != null && getMojo().getForceRewrite().booleanValue()) {
 
             getCmdLine().addArgument(getProps().getProperty("forceRewrite"));
         }
 
-        if (getMojo().getUpdateWebxmlEJBRefs() != null && getMojo().getUpdateWebxmlEJBRefs().booleanValue() == true) {
+        if (getMojo().getUpdateWebxmlEJBRefs() != null && getMojo().getUpdateWebxmlEJBRefs().booleanValue()) {
 
             getCmdLine().addArgument(getProps().getProperty("updateWebxmlEJBRefs"));
         }
@@ -271,7 +267,7 @@ public class OjdeployExecutor {
         Iterator<String> iterDefines = null;
         StringBuilder builder = null;
 
-        if (getMojo().getDefines() != null && getMojo().getDefines().size() > 0) {
+        if (getMojo().getDefines() != null && !getMojo().getDefines().isEmpty()) {
 
             getCmdLine().addArgument(getProps().getProperty("defines"));
 
@@ -292,18 +288,18 @@ public class OjdeployExecutor {
 
     }
 
-    private void initProperties() throws OjdeployExecutionExeption {
+    private void initProperties() {
 
         InputStream is = null;
-        Properties props = null;
+        Properties properties = null;
 
         try {
 
             LOG.debug("Initializing properties for executing ojdeploy.");
             is = OjdeployExecutor.class.getClassLoader().getResourceAsStream(PROPS_FILE);
-            props = new Properties();
-            props.load(is);
-            setProps(props);
+            properties = new Properties();
+            properties.load(is);
+            setProps(properties);
             LOG.debug("Finished initializing properties for executing ojdeploy.");
 
         } catch (Exception e) {
