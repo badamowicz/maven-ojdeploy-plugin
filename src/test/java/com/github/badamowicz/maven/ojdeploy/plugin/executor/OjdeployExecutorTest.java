@@ -75,6 +75,10 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         executorFilled.setDryRun(true);
     }
 
+    /**
+     * Beware this test will not create a working command line since the combination of arguments will not fit real world
+     * scenarios. Instead this test is only about evaluating if all parameters of the Mojo are handed over to the command line.
+     */
     @Test
     public void prepareCommandLine() {
 
@@ -87,7 +91,8 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         assertNotNull(cmdLine, "Command line not initialized!");
 
         expected = Pattern
-                .compile("/some/path/ojdeploy -verbose -buildfile /some/build.file -workspace /some/workspace.jws -outputfile .*/maven-ojdeploy-plugin/out.txt -project some.jpr -basedir .*/maven-ojdeploy-plugin/. -nocompile -nodependents -clean -nodatasources -forcerewrite -updatewebxmlejbrefs -statuslogfile /some/path/status.log -timeout 300 -define key1=value1,key2=value2");
+                .compile("/some/path/ojdeploy -verbose -buildfile /some/build.file -buildfileschema -profile profileXY -workspace /some/workspace.jws -outputfile .*/maven-ojdeploy-plugin/out.txt -project some.jpr -basedir .*/maven-ojdeploy-plugin/. -nocompile -nodependents -clean -nodatasources -forcerewrite -updatewebxmlejbrefs -statuslogfile /some/path/status.log -timeout 300 -define key1=value1,key2=value2");
+
         matcher = expected.matcher(cmdLine);
 
         assertTrue(matcher.matches(), "Command line not generated as expected!");

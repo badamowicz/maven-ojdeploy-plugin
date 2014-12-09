@@ -63,7 +63,7 @@ public abstract class AbstractOjdeployHelper {
                                                                };
     protected static final File              STATUS_LOG_FILE   = new File("/some/path/status.log");
     protected static final Long              TIMEOUT           = 300l;
-    protected static final Boolean           BUILD_FILE_SCHEMA = Boolean.FALSE;
+    protected static final Boolean           BUILD_FILE_SCHEMA = Boolean.TRUE;
     protected static final Boolean           DRY_RUN           = Boolean.TRUE;
     protected OjdeployMojo                   mojo              = null;
 

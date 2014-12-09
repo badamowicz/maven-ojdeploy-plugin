@@ -32,31 +32,31 @@ package com.github.badamowicz.maven.ojdeploy.plugin.exceptions;
  * @author bernd
  *
  */
-public class OjdeployExecutionExeption extends RuntimeException {
+public class OjdeployExecutionException extends RuntimeException {
 
     private static final long serialVersionUID = 9199740922863187821L;
 
-    public OjdeployExecutionExeption() {
+    public OjdeployExecutionException() {
 
         super();
     }
 
-    public OjdeployExecutionExeption(String message) {
+    public OjdeployExecutionException(String message) {
 
         super(message);
     }
 
-    public OjdeployExecutionExeption(Throwable cause) {
+    public OjdeployExecutionException(Throwable cause) {
 
         super(cause);
     }
 
-    public OjdeployExecutionExeption(String message, Throwable cause) {
+    public OjdeployExecutionException(String message, Throwable cause) {
 
         super(message, cause);
     }
 
-    public OjdeployExecutionExeption(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public OjdeployExecutionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 
         super(message, cause, enableSuppression, writableStackTrace);
     }

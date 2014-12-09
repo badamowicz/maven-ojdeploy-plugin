@@ -40,7 +40,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import com.github.badamowicz.maven.ojdeploy.plugin.exceptions.OjdeployExecutionExeption;
+import com.github.badamowicz.maven.ojdeploy.plugin.exceptions.OjdeployExecutionException;
 import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 
 /**
@@ -92,7 +92,7 @@ public class OjdeployExecutor {
         else if (osName.toLowerCase().contains("linux"))
             setOjdeployBinary(OJDEPLOY_BIN_LIN);
         else
-            throw new OjdeployExecutionExeption("Operating system" + osName + " is not supported!");
+            throw new OjdeployExecutionException("Operating system" + osName + " is not supported!");
 
         LOG.debug("Initialized ojdeploy binary for operating system " + osName + " with '" + getOjdeployBinary() + "'.");
     }
@@ -123,7 +123,7 @@ public class OjdeployExecutor {
 
         } catch (Exception e) {
 
-            throw new OjdeployExecutionExeption("Was not able to execute ojdeploy!\n", e);
+            throw new OjdeployExecutionException("Was not able to execute ojdeploy!\n", e);
         }
     }
 
@@ -181,13 +181,14 @@ public class OjdeployExecutor {
 
             getCmdLine().addArgument(getProps().getProperty("buildFile"));
             getCmdLine().addArgument(getMojo().getBuildFile().getAbsolutePath());
+        }
 
-        } else if (getMojo().getBuildFileSchema() != null) {
+        if (getMojo().getBuildFileSchema() != null && getMojo().getBuildFileSchema().booleanValue()) {
 
             getCmdLine().addArgument(getProps().getProperty("buildFileSchema"));
-            getCmdLine().addArgument(getMojo().getBuildFileSchema().toString());
+        }
 
-        } else if (getMojo().getProfile() != null) {
+        if (getMojo().getProfile() != null) {
 
             getCmdLine().addArgument(getProps().getProperty("profile"));
             getCmdLine().addArgument(getMojo().getProfile());
@@ -309,7 +310,7 @@ public class OjdeployExecutor {
 
         } catch (Exception e) {
 
-            throw new OjdeployExecutionExeption("Was not able to initialize properties for ojdeploy executor!\n", e);
+            throw new OjdeployExecutionException("Was not able to initialize properties for ojdeploy executor!\n", e);
 
         } finally {
 
