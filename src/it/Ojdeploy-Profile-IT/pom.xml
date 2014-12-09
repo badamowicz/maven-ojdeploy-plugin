@@ -21,6 +21,7 @@
         <version>@project.version@</version>
         <configuration>
           <dryRun>false</dryRun>
+          <verbose>true</verbose>
           <jdevBinPath>/opt/Oracle/Middleware/jdeveloper/jdev/bin</jdevBinPath>
           <workspaceFile>ShuttleDemo/ShuttleDemo.jws</workspaceFile>
           <outputFile></outputFile>

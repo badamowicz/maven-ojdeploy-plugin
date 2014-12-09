@@ -172,6 +172,11 @@ public class OjdeployExecutor {
         setCmdLine(new CommandLine(executable));
         LOG.debug("Base command initialized with: " + executable);
 
+        if (getMojo().getVerbose() != null && getMojo().getVerbose().booleanValue()) {
+
+            getCmdLine().addArgument(getProps().getProperty("verbose"));
+        }
+
         if (getMojo().getBuildFile() != null) {
 
             getCmdLine().addArgument(getProps().getProperty("buildFile"));

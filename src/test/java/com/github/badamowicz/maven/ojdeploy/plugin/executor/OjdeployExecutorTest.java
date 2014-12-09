@@ -87,7 +87,7 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         assertNotNull(cmdLine, "Command line not initialized!");
 
         expected = Pattern
-                .compile("/some/path/ojdeploy -buildfile /some/build.file -workspace /some/workspace.jws -outputfile .*/maven-ojdeploy-plugin/out.txt -project some.jpr -basedir .*/maven-ojdeploy-plugin/. -nocompile -nodependents -clean -nodatasources -forcerewrite -updatewebxmlejbrefs -statuslogfile /some/path/status.log -timeout 300 -define key1=value1,key2=value2");
+                .compile("/some/path/ojdeploy -verbose -buildfile /some/build.file -workspace /some/workspace.jws -outputfile .*/maven-ojdeploy-plugin/out.txt -project some.jpr -basedir .*/maven-ojdeploy-plugin/. -nocompile -nodependents -clean -nodatasources -forcerewrite -updatewebxmlejbrefs -statuslogfile /some/path/status.log -timeout 300 -define key1=value1,key2=value2");
         matcher = expected.matcher(cmdLine);
 
         assertTrue(matcher.matches(), "Command line not generated as expected!");

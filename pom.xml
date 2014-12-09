@@ -136,7 +136,7 @@
               </pomIncludes>
               <!-- <settingsFile>src/it/settings.xml</settingsFile> -->
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <postBuildHookScript>verify.groovy</postBuildHookScript>
+              <postBuildHookScript>verify</postBuildHookScript>
               <addTestClassPath>true</addTestClassPath>
               <goals>
                 <goal>install</goal>

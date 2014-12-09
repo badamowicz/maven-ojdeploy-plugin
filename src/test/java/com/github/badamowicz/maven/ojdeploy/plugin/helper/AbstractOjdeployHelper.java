@@ -52,6 +52,7 @@ public abstract class AbstractOjdeployHelper {
     protected static final Boolean           NODATASOURCES     = Boolean.TRUE;
     protected static final Boolean           FORCEWRITE        = Boolean.TRUE;
     protected static final Boolean           UPDATE_WEB_XML    = Boolean.TRUE;
+    protected static final Boolean           VERBOSE           = Boolean.TRUE;
     protected static final ArrayList<String> DEFINES           = new ArrayList<String>() {
                                                                    private static final long serialVersionUID = -3675484013465075644L;
 
@@ -87,6 +88,7 @@ public abstract class AbstractOjdeployHelper {
         mojo.setUpdateWebxmlEJBRefs(UPDATE_WEB_XML);
         mojo.setWorkspaceFile(WORKSPACE_FILE);
         mojo.setDryRun(DRY_RUN);
+        mojo.setVerbose(VERBOSE);
     }
 
 }

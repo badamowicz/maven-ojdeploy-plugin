@@ -50,6 +50,12 @@ public class OjdeployMojoTest extends AbstractOjdeployHelper {
     }
 
     @Test
+    private void testVerbose() {
+
+        assertEquals(mojo.getVerbose(), VERBOSE, "Verbose argument not set as expected!");
+    }
+
+    @Test
     private void getDryRun() {
 
         assertEquals(mojo.getDryRun(), DRY_RUN, "Dry run not set as expected!");

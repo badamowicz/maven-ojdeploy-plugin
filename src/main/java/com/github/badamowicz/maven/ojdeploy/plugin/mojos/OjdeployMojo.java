@@ -185,6 +185,13 @@ public class OjdeployMojo extends AbstractMojo {
      */
     private Long             timeout             = null;
 
+    /**
+     * Make ojdeploy issue more information.
+     * 
+     * @parameter property="verbose"
+     */
+    private Boolean          verbose             = null;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
@@ -377,6 +384,16 @@ public class OjdeployMojo extends AbstractMojo {
     public void setDryRun(Boolean dryRun) {
 
         this.dryRun = dryRun;
+    }
+
+    public Boolean getVerbose() {
+
+        return verbose;
+    }
+
+    public void setVerbose(Boolean verbose) {
+
+        this.verbose = verbose;
     }
 
 }
