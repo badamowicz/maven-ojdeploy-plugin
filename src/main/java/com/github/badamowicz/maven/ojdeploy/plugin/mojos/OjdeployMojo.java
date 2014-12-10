@@ -227,14 +227,12 @@ public class OjdeployMojo extends AbstractMojo {
      * 
      * @return A list of Mojo parameters.
      */
-    @SuppressWarnings("unchecked")
     List<MojoParameter> getParameterList() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
             SecurityException {
 
         List<MojoParameter> mojoParams = null;
         Field currField = null;
         MojoParameter currMojoParam = null;
-        String csvListValue = null;
 
         mojoParams = new ArrayList<MojoParameter>();
 
@@ -246,14 +244,12 @@ public class OjdeployMojo extends AbstractMojo {
 
                 if (currField.getType().isAssignableFrom(List.class)) {
 
-                    csvListValue = getCSListValue((List<String>) currField.get(this));
-
-                    if (!csvListValue.isEmpty())
-                        currMojoParam = new MojoParameter(currParam, csvListValue, String.class);
+                    currMojoParam = createListMojoParameter(currField, currParam);
 
                 } else if (currField.getType().isAssignableFrom(File.class)) {
 
                     currMojoParam = new MojoParameter(currParam, ((File) currField.get(this)).getAbsolutePath(), String.class);
+
                 } else {
 
                     currMojoParam = new MojoParameter(currParam, currField.get(this), currField.getType());
@@ -272,57 +268,49 @@ public class OjdeployMojo extends AbstractMojo {
         return mojoParams;
     }
 
+    /**
+     * Fields containing {@link List} objects need some special handling for converting list elements to a single string object.
+     * Method performs all necessary operations.
+     * 
+     * @param field The {@link Field} containing the {@link List} object.
+     * @param param The name of the parameter which will be handed over to the returned {@link MojoParameter}.
+     * @return A new {@link MojoParameter} object or <b>null</b> if the list object did not contain any elements.
+     * @throws IllegalAccessException if some of the reflection Voodoo done here will fail.
+     */
+    @SuppressWarnings("unchecked")
+    private MojoParameter createListMojoParameter(Field field, String param) throws IllegalAccessException {
+
+        MojoParameter mojoParam = null;
+        List<String> list = null;
+        Iterator<String> iter = null;
+        StringBuilder value = null;
+
+        list = (List<String>) field.get(this);
+
+        if (!list.isEmpty()) {
+
+            value = new StringBuilder();
+            iter = list.iterator();
+
+            while (iter.hasNext()) {
+
+                value.append(iter.next());
+
+                if (iter.hasNext())
+                    value.append(",");
+            }
+
+            mojoParam = new MojoParameter(param, value, String.class);
+
+        } else
+            LOG.debug("List contains no elements.");
+
+        return mojoParam;
+    }
+
     private boolean fieldIsInitialized(Field currField) throws IllegalAccessException {
 
         return currField != null && currField.get(this) != null;
-    }
-
-    /**
-     * Create a comma separated string containing all the values in the given list.
-     * 
-     * @param list A non empty list containing strings.
-     * @return A comma separated string of all list elements or an empty string if no elements are available.
-     */
-    private String getCSListValue(List<String> list) {
-
-        StringBuilder value = null;
-        Iterator<String> iter = null;
-
-        value = new StringBuilder();
-        iter = list.iterator();
-
-        while (iter.hasNext()) {
-
-            value.append(iter.next());
-
-            if (iter.hasNext())
-                value.append(",");
-        }
-
-        return value.toString();
-    }
-
-    /**
-     * Convenience method for checking if a parameter with the given name is available.
-     */
-    public boolean hasParameter(String parameter) {
-
-        boolean hasParameter = false;
-        Field field = null;
-
-        try {
-
-            field = getClass().getDeclaredField(parameter);
-
-            if (fieldIsInitialized(field))
-                hasParameter = true;
-
-        } catch (Exception e) {
-
-            LOG.warn("Could not retrieve information about parameter " + parameter + "\n", e);
-        }
-
-        return hasParameter;
     }
 
     public void setJdevBinPath(File jdevBinPath) {

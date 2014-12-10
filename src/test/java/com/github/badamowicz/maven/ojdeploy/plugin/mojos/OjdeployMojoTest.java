@@ -27,10 +27,8 @@
 package com.github.badamowicz.maven.ojdeploy.plugin.mojos;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,15 +62,6 @@ public class OjdeployMojoTest extends AbstractOjdeployHelper {
 
         emptyListMojo = new OjdeployMojo();
         emptyListMojo.setDefines(new ArrayList<String>(0));
-    }
-
-    @Test
-    public void hasParameter() {
-
-        assertTrue(fieldTestMojo.hasParameter("clean"), "Expected clean parameter to be available!");
-        assertTrue(fieldTestMojo.hasParameter("forceRewrite"), "Expected forceRewrite parameter to be available!");
-        assertTrue(fieldTestMojo.hasParameter("profile"), "Expected profile parameter to be available!");
-        assertFalse(fieldTestMojo.hasParameter("outputFile"), "Expected outputFile parameter not to be available!");
     }
 
     @Test
