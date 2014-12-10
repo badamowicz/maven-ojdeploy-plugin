@@ -27,12 +27,18 @@
 package com.github.badamowicz.maven.ojdeploy.plugin.mojos;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.github.badamowicz.maven.ojdeploy.plugin.executor.MojoParameter;
 import com.github.badamowicz.maven.ojdeploy.plugin.helper.AbstractOjdeployHelper;
 
 /**
@@ -43,10 +49,44 @@ import com.github.badamowicz.maven.ojdeploy.plugin.helper.AbstractOjdeployHelper
  */
 public class OjdeployMojoTest extends AbstractOjdeployHelper {
 
+    private OjdeployMojo fieldTestMojo = null;
+    private OjdeployMojo emptyListMojo = null;
+
     @BeforeClass
     public void beforeClass() {
 
         prepareDefaultMojo();
+
+        fieldTestMojo = new OjdeployMojo();
+        fieldTestMojo.setClean(true);
+        fieldTestMojo.setForceRewrite(false);
+        fieldTestMojo.setProfile("profile");
+
+        emptyListMojo = new OjdeployMojo();
+        emptyListMojo.setDefines(new ArrayList<String>(0));
+    }
+
+    @Test
+    public void hasParameter() {
+
+        assertTrue(fieldTestMojo.hasParameter("clean"), "Expected clean parameter to be available!");
+        assertTrue(fieldTestMojo.hasParameter("forceRewrite"), "Expected forceRewrite parameter to be available!");
+        assertTrue(fieldTestMojo.hasParameter("profile"), "Expected profile parameter to be available!");
+        assertFalse(fieldTestMojo.hasParameter("outputFile"), "Expected outputFile parameter not to be available!");
+    }
+
+    @Test
+    public void getParameterList() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
+            SecurityException {
+
+        List<MojoParameter> params = null;
+
+        params = mojo.getParameterList();
+        assertNotNull(params, "No parameter list available!");
+        assertEquals(params.size(), 18, "Not all available parameters in list!");
+
+        params = emptyListMojo.getParameterList();
+        assertEquals(params.size(), 0, "No parameters expected in list!");
     }
 
     @Test

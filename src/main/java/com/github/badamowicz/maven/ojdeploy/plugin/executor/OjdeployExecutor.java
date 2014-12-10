@@ -30,18 +30,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.github.badamowicz.maven.ojdeploy.plugin.exceptions.OjdeployExecutionException;
-import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 
 /**
  * This class actually performs the ojdeploy commands. It provides sufficient mappings and error handling if things go wrong.
@@ -53,20 +51,18 @@ import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
  */
 public class OjdeployExecutor {
 
-    private static final String OJDEPLOY_BIN_LIN = "ojdeploy";
+    private static final String OJDEPLOY_BIN_LIN    = "ojdeploy";
+    private static final String OJDEPLOY_BIN_WIN    = "ojdeploy.exe";
+    private static final String JDEV_BIN_PATH_PARAM = "jdevBinPath";
 
-    private static final String OJDEPLOY_BIN_WIN = "ojdeploy.exe";
+    private static final Logger LOG                 = Logger.getLogger(OjdeployExecutor.class);
 
-    private static final Logger LOG              = Logger.getLogger(OjdeployExecutor.class);
+    private static final String PROPS_FILE          = "executor.properties";
 
-    private static final String PROPS_FILE       = "executor.properties";
-
-    private Properties          props            = null;
-    private OjdeployMojo        mojo             = null;
-    private boolean             dryRun           = false;
-    private CommandLine         cmdLine          = null;
-    private String              ojdeployBinary   = null;
-    private long                timeout          = 30000L;
+    private Properties          props               = null;
+    private boolean             dryRun              = false;
+    private CommandLine         cmdLine             = null;
+    private String              ojdeployBinary      = null;
 
     /**
      * Constructor performs necessary initializations of internal data and mappings.
@@ -97,34 +93,121 @@ public class OjdeployExecutor {
         LOG.debug("Initialized ojdeploy binary for operating system " + osName + " with '" + getOjdeployBinary() + "'.");
     }
 
-    /**
-     * Actually executes the ojdeploy command with all the arguments provided by the given Mojo.
-     * 
-     * @param mojo The {@link OjdeployMojo} whose parameters will be used to initialize the ojdeploy command line.
-     * @param dryRun If set to true, no action will be taken. Instead only the command line as would have been executed will be
-     *        shown.
-     */
-    public void execute(OjdeployMojo mojo, boolean dryRun, long timeout) {
+    public void execute(List<MojoParameter> ojdParams, boolean dryRun) {
 
         try {
-            setMojo(mojo);
             setDryRun(dryRun);
-            prepareCommandLine();
+            prepareCommandLine(ojdParams);
 
-            if (isDryRun()) {
-
-                LOG.info("Dry run option is set. Would execute this command:");
-                LOG.info(getCmdLine());
-
-            } else {
-
+            if (isDryRun())
+                LOG.info("Dry run option is set. Would execute this command:\n" + getCmdLine());
+            else
                 exec();
-            }
 
         } catch (Exception e) {
 
             throw new OjdeployExecutionException("Was not able to execute ojdeploy!\n", e);
         }
+    }
+
+    /**
+     * Prepare the command line required for running ojdeploy.
+     * 
+     * @param ojdParams The list of parameters available.
+     */
+    void prepareCommandLine(List<MojoParameter> ojdParams) {
+
+        prepareJdevCommand(ojdParams);
+        prepareCommandArguments(ojdParams);
+    }
+
+    /**
+     * Prepare all the arguments necessary for running ojdeploy.
+     * 
+     * @param ojdParams The list of parameters available.
+     */
+    private void prepareCommandArguments(List<MojoParameter> ojdParams) {
+
+        LOG.debug("Start initializing ojdeploy arguments.");
+
+        for (MojoParameter currParam : ojdParams) {
+
+            if (isBooleanTrue(currParam)) {
+
+                LOG.debug("Adding boolean " + currParam.getParameterName());
+                addMappedCmdLineArgument(currParam.getParameterName());
+
+            } else if (!isBoolean(currParam) && !isJdevBinPath(currParam)) {
+
+                LOG.debug("Adding non-boolean " + currParam.getParameterName());
+                addMappedCmdLineArgument(currParam.getParameterName());
+                getCmdLine().addArgument(currParam.getParameterValue().toString());
+            }
+        }
+
+        LOG.debug("Finished initializing ojdeploy arguments.");
+    }
+
+    /**
+     * Detect if the given Mojo parameter is of type {@link Boolean}. It is <b>not</b> taken into account whether the value is
+     * true or false. Only the type matters! See {@link #isBooleanTrue(MojoParameter)} for also checking the value.
+     * 
+     * @param param A {@link MojoParameter}.
+     * @return true, if the given parameter is of type {@link Boolean}
+     * @see #isBooleanTrue(MojoParameter)
+     */
+    boolean isBoolean(MojoParameter param) {
+
+        return param.getType().isAssignableFrom(Boolean.class);
+    }
+
+    /**
+     * Detect if the given Mojo parameter is of type {@link Boolean} <b>and</b> its value is set to true.
+     * 
+     * @param param A {@link MojoParameter}.
+     * @return true, if the given parameter is of type {@link Boolean} <b>and</b> has a value of {@link Boolean#TRUE}.
+     * @see #isBoolean(MojoParameter)
+     */
+    boolean isBooleanTrue(MojoParameter param) {
+
+        return param.getType().isAssignableFrom(Boolean.class) && ((Boolean) param.getParameterValue()).booleanValue();
+    }
+
+    /**
+     * Prepare the start command for ojdeploy.
+     * 
+     * @param ojdParams The list of parameters available.
+     */
+    private void prepareJdevCommand(List<MojoParameter> ojdParams) {
+
+        String executable = null;
+        boolean binPathFound = false;
+
+        LOG.debug("Start initializing ojdeploy command line.");
+
+        for (MojoParameter currParam : ojdParams) {
+
+            if (isJdevBinPath(currParam)) {
+
+                binPathFound = true;
+
+                if (!((String) currParam.getParameterValue()).isEmpty())
+                    executable = currParam.getParameterValue() + "/" + getOjdeployBinary();
+                else
+                    executable = getOjdeployBinary();
+            }
+
+            if (binPathFound)
+                break;
+        }
+
+        setCmdLine(new CommandLine(executable));
+        LOG.debug("Base command initialized with: " + executable);
+    }
+
+    private boolean isJdevBinPath(MojoParameter currParam) {
+
+        return currParam.getParameterName().equals(JDEV_BIN_PATH_PARAM);
     }
 
     /**
@@ -134,7 +217,6 @@ public class OjdeployExecutor {
      */
     private void exec() throws IOException {
 
-        ExecuteWatchdog watchdog = null;
         FileOutputStream fos = null;
         PumpStreamHandler pStreamHandler = null;
         DefaultExecutor executor = null;
@@ -142,11 +224,9 @@ public class OjdeployExecutor {
 
         LOG.info("Start executing ojdeploy now with command:");
         LOG.info(getCmdLine());
-        watchdog = new ExecuteWatchdog(getTimeout());
         fos = new FileOutputStream(new File(getProps().getProperty("ojdeploy.build.log.file")));
         pStreamHandler = new PumpStreamHandler(fos);
         executor = new DefaultExecutor();
-        executor.setWatchdog(watchdog);
         executor.setStreamHandler(pStreamHandler);
         executor.setExitValue(Integer.valueOf(getProps().getProperty("exit.value")));
         exitVal = executor.execute(getCmdLine());
@@ -156,142 +236,14 @@ public class OjdeployExecutor {
     }
 
     /**
-     * Prepare the command line used internally for being executed later.
+     * Add a new mapped argument to the command line.
+     * 
+     * @param mojoParam The name of the Mojo's parameter. It will be mapped to the associated ojdeploy argument. For example the
+     *        Mojo parameter <i>updateWebxmlEJBRefs</i> will be mapped to the command line argument <i>-updatewebxmlejbrefs</i>.
      */
-    void prepareCommandLine() {
+    private void addMappedCmdLineArgument(String mojoParam) {
 
-        String executable = null;
-
-        LOG.debug("Start initializing ojdeploy command line.");
-
-        if (getMojo().getJdevBinPath() != null)
-            executable = getMojo().getJdevBinPath().getAbsolutePath() + "/" + getOjdeployBinary();
-        else
-            executable = getOjdeployBinary();
-
-        setCmdLine(new CommandLine(executable));
-        LOG.debug("Base command initialized with: " + executable);
-
-        if (getMojo().getVerbose() != null && getMojo().getVerbose().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("verbose"));
-        }
-
-        if (getMojo().getBuildFile() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("buildFile"));
-            getCmdLine().addArgument(getMojo().getBuildFile().getAbsolutePath());
-        }
-
-        if (getMojo().getBuildFileSchema() != null && getMojo().getBuildFileSchema().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("buildFileSchema"));
-        }
-
-        if (getMojo().getProfile() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("profile"));
-            getCmdLine().addArgument(getMojo().getProfile());
-        }
-
-        if (getMojo().getWorkspaceFile() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("workspaceFile"));
-            getCmdLine().addArgument(getMojo().getWorkspaceFile().getAbsolutePath());
-        }
-
-        if (getMojo().getOutputFile() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("outputFile"));
-            getCmdLine().addArgument(getMojo().getOutputFile().getAbsolutePath());
-        }
-
-        if (getMojo().getProject() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("project"));
-            getCmdLine().addArgument(getMojo().getProject());
-        }
-
-        if (getMojo().getBaseDir() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("baseDir"));
-            getCmdLine().addArgument(getMojo().getBaseDir().getAbsolutePath());
-        }
-
-        if (getMojo().getNocompile() != null && getMojo().getNocompile().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("nocompile"));
-        }
-
-        if (getMojo().getNodependents() != null && getMojo().getNodependents().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("nodependents"));
-        }
-
-        if (getMojo().getClean() != null && getMojo().getClean().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("clean"));
-        }
-
-        if (getMojo().getNodatasources() != null && getMojo().getNodatasources().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("nodatasources"));
-        }
-
-        if (getMojo().getForceRewrite() != null && getMojo().getForceRewrite().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("forceRewrite"));
-        }
-
-        if (getMojo().getUpdateWebxmlEJBRefs() != null && getMojo().getUpdateWebxmlEJBRefs().booleanValue()) {
-
-            getCmdLine().addArgument(getProps().getProperty("updateWebxmlEJBRefs"));
-        }
-
-        if (getMojo().getStatusLogFile() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("statusLogFile"));
-            getCmdLine().addArgument(getMojo().getStatusLogFile().getAbsolutePath());
-        }
-
-        if (getMojo().getTimeout() != null) {
-
-            getCmdLine().addArgument(getProps().getProperty("timeout"));
-            getCmdLine().addArgument(getMojo().getTimeout().toString());
-        }
-
-        addDefines();
-
-        LOG.debug("Finished initializing ojdeploy command line call with: " + getCmdLine().toString());
-    }
-
-    /**
-     * Add the 'defines' argument to the command line if available.
-     */
-    private void addDefines() {
-
-        Iterator<String> iterDefines = null;
-        StringBuilder builder = null;
-
-        if (getMojo().getDefines() != null && !getMojo().getDefines().isEmpty()) {
-
-            getCmdLine().addArgument(getProps().getProperty("defines"));
-
-            iterDefines = getMojo().getDefines().iterator();
-            builder = new StringBuilder("'");
-
-            while (iterDefines.hasNext()) {
-
-                builder.append(iterDefines.next());
-
-                if (iterDefines.hasNext())
-                    builder.append(",");
-            }
-
-            builder.append("'");
-            getCmdLine().addArgument(builder.toString());
-        }
-
+        getCmdLine().addArgument(getProps().getProperty(mojoParam));
     }
 
     private void initProperties() {
@@ -328,16 +280,6 @@ public class OjdeployExecutor {
         this.props = props;
     }
 
-    OjdeployMojo getMojo() {
-
-        return mojo;
-    }
-
-    void setMojo(OjdeployMojo mojo) {
-
-        this.mojo = mojo;
-    }
-
     boolean isDryRun() {
 
         return dryRun;
@@ -366,15 +308,5 @@ public class OjdeployExecutor {
     void setOjdeployBinary(String ojdeployBinary) {
 
         this.ojdeployBinary = ojdeployBinary;
-    }
-
-    long getTimeout() {
-
-        return timeout;
-    }
-
-    void setTimeout(long timeout) {
-
-        this.timeout = timeout;
     }
 }

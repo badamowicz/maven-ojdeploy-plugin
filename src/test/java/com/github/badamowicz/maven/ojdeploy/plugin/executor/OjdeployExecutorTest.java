@@ -27,19 +27,19 @@
 package com.github.badamowicz.maven.ojdeploy.plugin.executor;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.exec.CommandLine;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.badamowicz.maven.ojdeploy.plugin.helper.AbstractOjdeployHelper;
-import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
 
 /**
  * Test cases for {@link OjdeployExecutor}.
@@ -49,30 +49,54 @@ import com.github.badamowicz.maven.ojdeploy.plugin.mojos.OjdeployMojo;
  */
 public class OjdeployExecutorTest extends AbstractOjdeployHelper {
 
-    private OjdeployExecutor     executorSimple = null;
-    private OjdeployExecutor     executorFilled = null;
-    private OjdeployMojo         mojoSimple     = null;
-    private static final boolean DRY_RUN        = true;
-    private CommandLine          cmdLine        = null;
-    private static final long    TIMEOUT        = 30001l;
+    private OjdeployExecutor                 executorSimple      = null;
+    private OjdeployExecutor                 executorFilled      = null;
+    private OjdeployExecutor                 executorCmdLineTest = null;
+    private static final boolean             DRY_RUN             = true;
+    private CommandLine                      cmdLine             = null;
+
+    private static final MojoParameter       BOOL_TEST_PARAM_1   = new MojoParameter("booltrue", Boolean.TRUE, Boolean.class);
+    private static final MojoParameter       BOOL_TEST_PARAM_2   = new MojoParameter("boolfalse", Boolean.FALSE, Boolean.class);
+    private static final MojoParameter       BOOL_TEST_PARAM_3   = new MojoParameter("nobool", "gedoens", String.class);
+
+    private static final MojoParameter       M_PARAM_1           = new MojoParameter("jdevBinPath", "/some/path", String.class);
+    private static final MojoParameter       M_PARAM_2           = new MojoParameter("verbose", Boolean.TRUE, Boolean.class);
+    private static final MojoParameter       M_PARAM_3           = new MojoParameter("defines", "x=2y,a=3b", String.class);
+    private static final List<MojoParameter> MOJO_PARAMS         = new ArrayList<MojoParameter>() {
+
+                                                                     private static final long serialVersionUID = -1247247846260635366L;
+
+                                                                     {
+                                                                         add(M_PARAM_1);
+                                                                         add(M_PARAM_2);
+                                                                         add(M_PARAM_3);
+                                                                     }
+                                                                 };
 
     @BeforeClass
     public void beforeClass() {
 
         prepareDefaultMojo();
 
-        mojoSimple = new OjdeployMojo();
         cmdLine = new CommandLine("gedoens.sh");
 
         executorSimple = new OjdeployExecutor();
         executorSimple.setDryRun(DRY_RUN);
-        executorSimple.setMojo(mojoSimple);
         executorSimple.setCmdLine(cmdLine);
-        executorSimple.setTimeout(TIMEOUT);
 
         executorFilled = new OjdeployExecutor();
-        executorFilled.setMojo(mojo);
         executorFilled.setDryRun(true);
+
+        executorCmdLineTest = new OjdeployExecutor();
+    }
+
+    @Test
+    public void isBooleanTrue() {
+
+        assertTrue(executorSimple.isBooleanTrue(BOOL_TEST_PARAM_1), "Boolean parameter with value true not detected!");
+        assertFalse(executorSimple.isBooleanTrue(BOOL_TEST_PARAM_2),
+                "Boolean parameter with value false should not have been detected!");
+        assertFalse(executorSimple.isBooleanTrue(BOOL_TEST_PARAM_3), "Non-boolean parameter should not have been detected!");
     }
 
     /**
@@ -82,20 +106,8 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
     @Test
     public void prepareCommandLine() {
 
-        String cmdLine = null;
-        Pattern expected = null;
-        Matcher matcher = null;
-
-        executorFilled.prepareCommandLine();
-        cmdLine = executorFilled.getCmdLine().toString();
-        assertNotNull(cmdLine, "Command line not initialized!");
-
-        expected = Pattern
-                .compile("/some/path/ojdeploy -verbose -buildfile /some/build.file -buildfileschema -profile profileXY -workspace /some/workspace.jws -outputfile .*/maven-ojdeploy-plugin/out.txt -project some.jpr -basedir .*/maven-ojdeploy-plugin/. -nocompile -nodependents -clean -nodatasources -forcerewrite -updatewebxmlejbrefs -statuslogfile /some/path/status.log -timeout 300 -define key1=value1,key2=value2");
-
-        matcher = expected.matcher(cmdLine);
-
-        assertTrue(matcher.matches(), "Command line not generated as expected!");
+        executorCmdLineTest.prepareCommandLine(MOJO_PARAMS);
+        assertEquals(executorCmdLineTest.getCmdLine().toString(), "/some/path/ojdeploy -verbose -define x=2y,a=3b");
     }
 
     @Test
@@ -111,18 +123,6 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         else if (osName.toLowerCase().contains("linux"))
             assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy");
 
-    }
-
-    @Test
-    public void getTimeout() {
-
-        assertEquals(executorSimple.getTimeout(), TIMEOUT, "Timout value not set as expected!");
-    }
-
-    @Test
-    public void getMojo() {
-
-        assertSame(executorSimple.getMojo(), mojoSimple, "Not the same Mojo returned!");
     }
 
     @Test

@@ -27,12 +27,18 @@
 package com.github.badamowicz.maven.ojdeploy.plugin.mojos;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import com.github.badamowicz.maven.ojdeploy.plugin.executor.MojoParameter;
 import com.github.badamowicz.maven.ojdeploy.plugin.executor.OjdeployExecutor;
 
 /**
@@ -51,7 +57,17 @@ import com.github.badamowicz.maven.ojdeploy.plugin.executor.OjdeployExecutor;
  */
 public class OjdeployMojo extends AbstractMojo {
 
-    private OjdeployExecutor executor            = null;
+    private OjdeployExecutor          executor            = null;
+    private static final Logger       LOG                 = Logger.getLogger(OjdeployMojo.class);
+
+    /**
+     * These are the parameters which must be handed over to ojdeploy as command line arguments. Be sure to have 'verbose' as the
+     * first argument, otherwise it will have no effect on ojdeploy.
+     */
+    private static final List<String> OJDEPLOY_PARAMS     = Arrays.asList(new String[] { "verbose", "jdevBinPath",
+            "workspaceFile", "buildFile", "outputFile", "profile", "project", "buildFileSchema", "baseDir", "nocompile",
+            "nodependents", "clean", "nodatasources", "forceRewrite", "updateWebxmlEJBRefs", "defines", "statusLogFile",
+            "timeout"                                    });
 
     /**
      * If set to true, only the ojdeploy-command that would have been executed will be issued. Beware that this parameter will
@@ -59,7 +75,7 @@ public class OjdeployMojo extends AbstractMojo {
      * 
      * @parameter property="dryRun" default-value="false"
      */
-    private Boolean          dryRun              = null;
+    private Boolean                   dryRun              = null;
 
     /**
      * The path pointing to the directory containing the ojdeploy binary. Example:
@@ -68,28 +84,28 @@ public class OjdeployMojo extends AbstractMojo {
      * 
      * @parameter property="jdevBinPath"
      */
-    private File             jdevBinPath         = null;
+    private File                      jdevBinPath         = null;
 
     /**
      * Full path to the JDeveloper Workspace file (.jws).
      * 
      * @parameter property="workspaceFile"
      */
-    private File             workspaceFile       = null;
+    private File                      workspaceFile       = null;
 
     /**
      * Full path to a build file for batch deploy. This parameter is mutual exclusive with 'buildFileSchema' and 'profile'.
      * 
      * @parameter property="buildFile"
      */
-    private File             buildFile           = null;
+    private File                      buildFile           = null;
 
     /**
      * The report's file name.
      * 
      * parameter property="outputFile"
      */
-    private File             outputFile          = null;
+    private File                      outputFile          = null;
 
     /**
      * The profile file to be used. This parameter is mutual exclusive with 'buildFile' and 'buildFileSchema'.
@@ -97,7 +113,7 @@ public class OjdeployMojo extends AbstractMojo {
      * @parameter property="profile"
      * @required
      */
-    private String           profile             = null;
+    private String                    profile             = null;
 
     /**
      * Name of the JDeveloper Project within the .jws where the Profile can be found. If omitted, the Profile is assumed to be in
@@ -105,63 +121,63 @@ public class OjdeployMojo extends AbstractMojo {
      * 
      * @parameter property="project"
      */
-    private String           project             = null;
+    private String                    project             = null;
 
     /**
      * Print XML Schema for the build file. This property is mutual exclusive with the parameters 'profile' and 'buildFile'.
      * 
      * @parameter property="buildFileSchema"
      */
-    private Boolean          buildFileSchema     = null;
+    private Boolean                   buildFileSchema     = null;
 
     /**
      * Path for workspace relative to a base directory.
      * 
      * @parameter property="baseDir"
      */
-    private File             baseDir             = null;
+    private File                      baseDir             = null;
 
     /**
      * Skip compilation of Project or Workspace.
      * 
      * @parameter property="nocompile"
      */
-    private Boolean          nocompile           = null;
+    private Boolean                   nocompile           = null;
 
     /**
      * Do not deploy dependent profiles.
      * 
      * @parameter property="nodependents"
      */
-    private Boolean          nodependents        = null;
+    private Boolean                   nodependents        = null;
 
     /**
      * Clean output directories before compiling.
      * 
      * @parameter property="clean"
      */
-    private Boolean          clean               = null;
+    private Boolean                   clean               = null;
 
     /**
      * Do not include datasources from IDE.
      * 
      * @parameter property="nodatasources"
      */
-    private Boolean          nodatasources       = null;
+    private Boolean                   nodatasources       = null;
 
     /**
      * Rewrite output file even if it is identical to existing file.
      * 
      * @parameter property="forceRewrite"
      */
-    private Boolean          forceRewrite        = null;
+    private Boolean                   forceRewrite        = null;
 
     /**
      * Update EJB references in web.xml.
      * 
      * @parameter property="updateWebxmlEJBRefs"
      */
-    private Boolean          updateWebxmlEJBRefs = null;
+    private Boolean                   updateWebxmlEJBRefs = null;
 
     /**
      * Define variables as </i>key=value pairs</i> as nested elements. This parameter conforms to the original 'define' argument
@@ -169,41 +185,144 @@ public class OjdeployMojo extends AbstractMojo {
      * 
      * @parameter property="defines"
      */
-    private List<String>     defines             = null;
+    private List<String>              defines             = null;
 
     /**
      * Full path to an output file for status summary. No macros allowed.
      * 
      * @parameter property="statusLogFile"
      */
-    private File             statusLogFile       = null;
+    private File                      statusLogFile       = null;
 
     /**
      * Time in seconds allowed for each deployment task.
      * 
      * @parameter property="timeout" default-value="30000"
      */
-    private Long             timeout             = null;
+    private Long                      timeout             = null;
 
     /**
      * Make ojdeploy issue more information.
      * 
      * @parameter property="verbose"
      */
-    private Boolean          verbose             = null;
+    private Boolean                   verbose             = null;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
 
             executor = new OjdeployExecutor();
-            executor.execute(this, getDryRun(), getTimeout());
+            executor.execute(getParameterList(), getDryRun());
 
         } catch (Exception e) {
 
             throw new MojoExecutionException("Failed executing ojdeploy!\n", e);
         }
 
+    }
+
+    /**
+     * Prepare the list of internal arguments and values handed over to {@link OjdeployExecutor}.
+     * 
+     * @return A list of Mojo parameters.
+     */
+    @SuppressWarnings("unchecked")
+    List<MojoParameter> getParameterList() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
+            SecurityException {
+
+        List<MojoParameter> mojoParams = null;
+        Field currField = null;
+        MojoParameter currMojoParam = null;
+        String csvListValue = null;
+
+        mojoParams = new ArrayList<MojoParameter>();
+
+        for (String currParam : OJDEPLOY_PARAMS) {
+
+            currField = getClass().getDeclaredField(currParam);
+
+            if (fieldIsInitialized(currField)) {
+
+                if (currField.getType().isAssignableFrom(List.class)) {
+
+                    csvListValue = getCSListValue((List<String>) currField.get(this));
+
+                    if (!csvListValue.isEmpty())
+                        currMojoParam = new MojoParameter(currParam, csvListValue, String.class);
+
+                } else if (currField.getType().isAssignableFrom(File.class)) {
+
+                    currMojoParam = new MojoParameter(currParam, ((File) currField.get(this)).getAbsolutePath(), String.class);
+                } else {
+
+                    currMojoParam = new MojoParameter(currParam, currField.get(this), currField.getType());
+                }
+
+                if (currMojoParam != null) {
+                    mojoParams.add(currMojoParam);
+                    LOG.debug("New mojo parameter added to list: " + currMojoParam);
+                }
+            }
+
+            currMojoParam = null;
+        }
+
+        LOG.debug("Gathered " + mojoParams.size() + " arguments for ojdeploy.");
+        return mojoParams;
+    }
+
+    private boolean fieldIsInitialized(Field currField) throws IllegalAccessException {
+
+        return currField != null && currField.get(this) != null;
+    }
+
+    /**
+     * Create a comma separated string containing all the values in the given list.
+     * 
+     * @param list A non empty list containing strings.
+     * @return A comma separated string of all list elements or an empty string if no elements are available.
+     */
+    private String getCSListValue(List<String> list) {
+
+        StringBuilder value = null;
+        Iterator<String> iter = null;
+
+        value = new StringBuilder();
+        iter = list.iterator();
+
+        while (iter.hasNext()) {
+
+            value.append(iter.next());
+
+            if (iter.hasNext())
+                value.append(",");
+        }
+
+        return value.toString();
+    }
+
+    /**
+     * Convenience method for checking if a parameter with the given name is available.
+     */
+    public boolean hasParameter(String parameter) {
+
+        boolean hasParameter = false;
+        Field field = null;
+
+        try {
+
+            field = getClass().getDeclaredField(parameter);
+
+            if (fieldIsInitialized(field))
+                hasParameter = true;
+
+        } catch (Exception e) {
+
+            LOG.warn("Could not retrieve information about parameter " + parameter + "\n", e);
+        }
+
+        return hasParameter;
     }
 
     public void setJdevBinPath(File jdevBinPath) {
