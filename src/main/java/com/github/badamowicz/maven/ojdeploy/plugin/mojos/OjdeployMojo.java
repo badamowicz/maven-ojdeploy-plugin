@@ -242,18 +242,7 @@ public class OjdeployMojo extends AbstractMojo {
 
             if (fieldIsInitialized(currField)) {
 
-                if (currField.getType().isAssignableFrom(List.class)) {
-
-                    currMojoParam = createListMojoParameter(currField, currParam);
-
-                } else if (currField.getType().isAssignableFrom(File.class)) {
-
-                    currMojoParam = createFileMojoParameter(currField, currParam);
-
-                } else {
-
-                    currMojoParam = new MojoParameter(currParam, currField.get(this), currField.getType());
-                }
+                currMojoParam = convertFieldToParam(currField, currParam);
 
                 if (currMojoParam != null) {
                     mojoParams.add(currMojoParam);
@@ -266,6 +255,34 @@ public class OjdeployMojo extends AbstractMojo {
 
         LOG.debug("Gathered " + mojoParams.size() + " arguments for ojdeploy.");
         return mojoParams;
+    }
+
+    /**
+     * Convert the given field into a {@link MojoParameter} object.
+     * 
+     * @param field The {@link Field} to be converted.
+     * @param param The parameter name to be used for the {@link MojoParameter} object which is created.
+     * @return A new {@link MojoParameter} object or <b>null</b> if it was not possible to generate the object.
+     * @throws IllegalAccessException if some of the reflection Voodoo done here will fail.
+     */
+    private MojoParameter convertFieldToParam(Field field, String param) throws IllegalAccessException {
+
+        MojoParameter currMojoParam;
+
+        if (field.getType().isAssignableFrom(List.class)) {
+
+            currMojoParam = createListMojoParameter(field, param);
+
+        } else if (field.getType().isAssignableFrom(File.class)) {
+
+            currMojoParam = createFileMojoParameter(field, param);
+
+        } else {
+
+            currMojoParam = new MojoParameter(param, field.get(this), field.getType());
+        }
+
+        return currMojoParam;
     }
 
     /**
