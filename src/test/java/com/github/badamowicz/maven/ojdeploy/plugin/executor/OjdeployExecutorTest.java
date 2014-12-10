@@ -50,7 +50,6 @@ import com.github.badamowicz.maven.ojdeploy.plugin.helper.AbstractOjdeployHelper
 public class OjdeployExecutorTest extends AbstractOjdeployHelper {
 
     private OjdeployExecutor                 executorSimple      = null;
-    private OjdeployExecutor                 executorFilled      = null;
     private OjdeployExecutor                 executorCmdLineTest = null;
     private static final boolean             DRY_RUN             = true;
     private CommandLine                      cmdLine             = null;
@@ -84,9 +83,6 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         executorSimple.setDryRun(DRY_RUN);
         executorSimple.setCmdLine(cmdLine);
 
-        executorFilled = new OjdeployExecutor();
-        executorFilled.setDryRun(true);
-
         executorCmdLineTest = new OjdeployExecutor();
     }
 
@@ -97,6 +93,14 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
         assertFalse(executorSimple.isBooleanTrue(BOOL_TEST_PARAM_2),
                 "Boolean parameter with value false should not have been detected!");
         assertFalse(executorSimple.isBooleanTrue(BOOL_TEST_PARAM_3), "Non-boolean parameter should not have been detected!");
+    }
+
+    @Test
+    public void isBoolean() {
+
+        assertTrue(executorSimple.isBoolean(BOOL_TEST_PARAM_1), "Boolean parameter not detected!");
+        assertTrue(executorSimple.isBoolean(BOOL_TEST_PARAM_2), "Boolean parameter not detected!");
+        assertFalse(executorSimple.isBoolean(BOOL_TEST_PARAM_3), "Non-boolean parameter should not have been detected!");
     }
 
     /**
@@ -113,16 +117,19 @@ public class OjdeployExecutorTest extends AbstractOjdeployHelper {
     @Test
     public void getOjdeployBinary() {
 
-        String osName = null;
+        String osNameBackup = null;
 
-        osName = System.getProperty("os.name");
+        osNameBackup = System.getProperty("os.name");
+
+        System.setProperty("os.name", "Windoofs");
         executorSimple.initOjdeployBinary();
+        assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy.exe");
 
-        if (osName.toLowerCase().contains("win"))
-            assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy.exe");
-        else if (osName.toLowerCase().contains("linux"))
-            assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy");
+        System.setProperty("os.name", "Linux");
+        executorSimple.initOjdeployBinary();
+        assertEquals(executorSimple.getOjdeployBinary(), "ojdeploy");
 
+        System.setProperty("os.name", osNameBackup);
     }
 
     @Test

@@ -41,9 +41,9 @@ public class MojoParameter {
     public MojoParameter(String parameterName, Object parameterValue, Class<?> type) {
 
         super();
-        this.parameterName = parameterName;
-        this.parameterValue = parameterValue;
-        this.type = type;
+        setParameterName(parameterName);
+        setParameterValue(parameterValue);
+        setType(type);
     }
 
     public String getParameterName() {

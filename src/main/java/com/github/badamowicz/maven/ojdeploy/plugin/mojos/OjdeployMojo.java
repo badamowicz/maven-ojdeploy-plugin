@@ -36,7 +36,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 import com.github.badamowicz.maven.ojdeploy.plugin.executor.MojoParameter;
 import com.github.badamowicz.maven.ojdeploy.plugin.executor.OjdeployExecutor;
@@ -208,7 +207,7 @@ public class OjdeployMojo extends AbstractMojo {
      */
     private Boolean                   verbose             = null;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException {
 
         try {
 
