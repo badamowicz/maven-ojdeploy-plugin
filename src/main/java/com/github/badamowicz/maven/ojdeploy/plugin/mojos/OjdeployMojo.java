@@ -248,7 +248,7 @@ public class OjdeployMojo extends AbstractMojo {
 
                 } else if (currField.getType().isAssignableFrom(File.class)) {
 
-                    currMojoParam = new MojoParameter(currParam, ((File) currField.get(this)).getAbsolutePath(), String.class);
+                    currMojoParam = createFileMojoParameter(currField, currParam);
 
                 } else {
 
@@ -269,8 +269,32 @@ public class OjdeployMojo extends AbstractMojo {
     }
 
     /**
+     * Fields containing {@link File} objects need some special handling for converting to regular {@link String} objects. Method
+     * performs all necessary operations.
+     * 
+     * @param field The {@link Field} containing the {@link File} object.
+     * @param param The name of the parameter which will be handed over to the returned {@link MojoParameter}.
+     * @return A new {@link MojoParameter} object or <b>null</b> if it was not possible to generate the object.
+     */
+    private MojoParameter createFileMojoParameter(Field field, String param) {
+
+        MojoParameter mojoParam = null;
+
+        try {
+
+            mojoParam = new MojoParameter(param, ((File) field.get(this)).getAbsolutePath(), String.class);
+
+        } catch (Exception e) {
+
+            LOG.error("Could not convert File field for parameter " + param + " into parameter object!\n", e);
+        }
+
+        return mojoParam;
+    }
+
+    /**
      * Fields containing {@link List} objects need some special handling for converting list elements to a single string object.
-     * Method performs all necessary operations.
+     * Method performs all necessary operations and creates an appropriate {@link MojoParameter} object.
      * 
      * @param field The {@link Field} containing the {@link List} object.
      * @param param The name of the parameter which will be handed over to the returned {@link MojoParameter}.
