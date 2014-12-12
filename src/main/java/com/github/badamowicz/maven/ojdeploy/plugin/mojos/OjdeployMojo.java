@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
+import com.github.badamowicz.maven.ojdeploy.plugin.exceptions.OjdeployExecutionException;
 import com.github.badamowicz.maven.ojdeploy.plugin.executor.MojoParameter;
 import com.github.badamowicz.maven.ojdeploy.plugin.executor.OjdeployExecutor;
 
@@ -207,6 +208,7 @@ public class OjdeployMojo extends AbstractMojo {
      */
     private Boolean                   verbose             = null;
 
+    @Override
     public void execute() throws MojoExecutionException {
 
         try {
@@ -226,30 +228,28 @@ public class OjdeployMojo extends AbstractMojo {
      * 
      * @return A list of Mojo parameters.
      */
-    List<MojoParameter> getParameterList() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
-            SecurityException {
+    List<MojoParameter> getParameterList() {
 
         List<MojoParameter> mojoParams = null;
-        Field currField = null;
         MojoParameter currMojoParam = null;
 
-        mojoParams = new ArrayList<MojoParameter>();
+        try {
+            mojoParams = new ArrayList<MojoParameter>();
 
-        for (String currParam : OJDEPLOY_PARAMS) {
+            for (String currParam : OJDEPLOY_PARAMS) {
 
-            currField = getClass().getDeclaredField(currParam);
-
-            if (fieldIsInitialized(currField)) {
-
-                currMojoParam = convertFieldToParam(currField, currParam);
+                currMojoParam = convertFieldToParam(getClass().getDeclaredField(currParam), currParam);
 
                 if (currMojoParam != null) {
                     mojoParams.add(currMojoParam);
                     LOG.debug("New mojo parameter added to list: " + currMojoParam);
                 }
-            }
 
-            currMojoParam = null;
+                currMojoParam = null;
+            }
+        } catch (Exception e) {
+
+            throw new OjdeployExecutionException("Was not able to generate Mojo's parameter list!", e);
         }
 
         LOG.debug("Gathered " + mojoParams.size() + " arguments for ojdeploy.");
@@ -266,22 +266,25 @@ public class OjdeployMojo extends AbstractMojo {
      */
     private MojoParameter convertFieldToParam(Field field, String param) throws IllegalAccessException {
 
-        MojoParameter currMojoParam;
+        MojoParameter mojoParam = null;
 
-        if (field.getType().isAssignableFrom(List.class)) {
+        if (fieldIsInitialized(field)) {
 
-            currMojoParam = createListMojoParameter(field, param);
+            if (field.getType().isAssignableFrom(List.class)) {
 
-        } else if (field.getType().isAssignableFrom(File.class)) {
+                mojoParam = createListMojoParameter(field, param);
 
-            currMojoParam = createFileMojoParameter(field, param);
+            } else if (field.getType().isAssignableFrom(File.class)) {
 
-        } else {
+                mojoParam = createFileMojoParameter(field, param);
 
-            currMojoParam = new MojoParameter(param, field.get(this), field.getType());
+            } else {
+
+                mojoParam = new MojoParameter(param, field.get(this), field.getType());
+            }
         }
 
-        return currMojoParam;
+        return mojoParam;
     }
 
     /**
